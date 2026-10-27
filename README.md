@@ -1,4 +1,3 @@
-[diagnostico_itens.html](https://github.com/user-attachments/files/33788162/diagnostico_itens.html)
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Diagnóstico de Itens</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 :root{--bg:#f5f6f8;--card:#fff;--text:#18202a;--muted:#667085;--line:#e4e7ec;--accent:#2563eb;--good:#067647;--warn:#b54708;--bad:#b42318}
@@ -22,7 +22,7 @@ input[type=file]{padding:7px} input[type=number]{width:120px}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}.tab{background:#f2f4f7;border:1px solid var(--line)}.tab.active{background:#eaf2ff;color:#175cd3;border-color:#b2ccff}
 .tablewrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:8px}
 th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}th{position:sticky;top:0;background:#f8fafc;z-index:1}
-.l{text-align:left!important}.badge{display:inline-block;background:#fef0c7;color:#93370d;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:700;margin-left:6px}.tip{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#eaf2ff;color:#175cd3;border:1px solid #b2ccff;font:700 10px Arial;margin-left:5px;cursor:help;vertical-align:middle;user-select:none}.tip:hover,.tip:focus{background:#175cd3;color:#fff;outline:none}#tipbox{position:fixed;display:none;max-width:300px;background:#101828;color:#fff;font-size:12px;line-height:1.5;font-weight:400;padding:10px 12px;border-radius:8px;box-shadow:0 4px 14px #0004;z-index:100;pointer-events:none}.rR td{background:#fef3f2}.rY td{background:#fffaeb}.rN td{background:#f2f4f7}.st{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}.stR{background:#fecdca;color:#912018}.stY{background:#fedf89;color:#93370d}.stG{background:#abefc6;color:#067647}.stN{background:#d0d5dd;color:#344054}.mode{display:flex;gap:16px;margin-bottom:14px;font-size:14px;font-weight:700}.mode label{font-size:14px;color:var(--text);display:flex;gap:6px;align-items:center}.mode input{height:auto}.fl{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:12px}.fl span{display:flex;gap:6px;align-items:center;background:#f2f4f7;padding:4px 8px;border-radius:8px}.fl input{height:30px}table.cmp{width:auto;margin-top:12px}table.cmp td,table.cmp th{text-align:right}
+.l{text-align:left!important}.badge{display:inline-block;background:#fef0c7;color:#93370d;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:700;margin-left:6px}.tip{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#eaf2ff;color:#175cd3;border:1px solid #b2ccff;font:700 10px Arial;margin-left:5px;cursor:help;vertical-align:middle;user-select:none}.tip:hover,.tip:focus{background:#175cd3;color:#fff;outline:none}#tipbox{position:fixed;display:none;max-width:300px;background:#101828;color:#fff;font-size:12px;line-height:1.5;font-weight:400;padding:10px 12px;border-radius:8px;box-shadow:0 4px 14px #0004;z-index:100;pointer-events:none}input[type=checkbox]{width:16px;height:16px}.rR td{background:#fef3f2}.rY td{background:#fffaeb}.rN td{background:#f2f4f7}.st{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}.stR{background:#fecdca;color:#912018}.stY{background:#fedf89;color:#93370d}.stG{background:#abefc6;color:#067647}.stN{background:#d0d5dd;color:#344054}.mode{display:flex;gap:16px;margin-bottom:14px;font-size:14px;font-weight:700}.mode label{font-size:14px;color:var(--text);display:flex;gap:6px;align-items:center}.mode input{height:auto}.fl{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:12px}.fl span{display:flex;gap:6px;align-items:center;background:#f2f4f7;padding:4px 8px;border-radius:8px}.fl input{height:30px}table.cmp{width:auto;margin-top:12px}table.cmp td,table.cmp th{text-align:right}
 .bad{color:var(--bad);font-weight:700}.warn{color:var(--warn);font-weight:700}.good{color:var(--good);font-weight:700}
 .note{font-size:12px;color:var(--muted);line-height:1.5}
 #status{margin-top:8px;color:var(--muted);font-size:13px}
@@ -46,6 +46,14 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
   </div>
   <div id="status">Envie o relatório para começar.</div>
 </div>
+
+<div class="card" id="histCard"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h3 style="margin:0">🗄️ Histórico de relatórios</h3><span class="note" id="histUser"></span></div>
+ <p class="note" id="histMsg">Carregando...</p>
+ <div id="histLogin" class="controls" style="display:none"><div class="field"><label>E-mail</label><input id="hEmail" type="email" autocomplete="username"></div><div class="field"><label>Senha</label><input id="hPass" type="password" autocomplete="current-password"></div><button class="primary" id="hLogin">Entrar</button></div>
+ <div id="histBox" style="display:none">
+  <div class="controls" style="margin-bottom:10px"><button class="primary" id="hLoad">Carregar selecionados</button><button id="hSave" style="display:none">Salvar arquivos carregados no histórico</button><button id="hDel" style="display:none">Excluir selecionados</button><button id="hRef">Atualizar lista</button><button id="hOut">Sair</button></div>
+  <div class="tablewrap" style="max-height:260px"><table><thead><tr><th class="l"><input type="checkbox" id="hAll" title="Marcar todos"></th><th class="l">Dia</th><th class="l">Arquivo</th><th class="l">Salvo em</th><th class="l">Por</th></tr></thead><tbody id="hBody"></tbody></table></div>
+ </div></div>
 
 <div id="app" style="display:none">
 <div class="card" id="periodCard" style="display:none"><div class="fl" id="flist"></div>
@@ -81,6 +89,14 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
  <div class="field"><label>Classe</label><select id="abcCls"><option value="">Todas</option><option>A</option><option>B</option><option>C</option></select></div></div>
  <div id="abcSum" style="margin-top:12px"></div><p class="note" id="abcNote"></p>
  <div class="tablewrap"><table><thead id="abcHead"></thead><tbody id="abcBody"></tbody></table></div><div id="abcMore" style="margin-top:10px"></div></details>
+<details class="card" id="planbox"><summary style="cursor:pointer;font-weight:700;font-size:16px">🎯 Plano de Ação de Preços</summary>
+ <div class="controls" style="margin-top:14px">
+  <div class="field"><label>Margem alvo (%) <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Margem do sistema (lucro depois do custo de compra, do ICMS de saída e do custo operacional) que cada item deve atingir. Preço de equilíbrio = Ct Compra ÷ (1 − custos de venda do item). Preço p/ meta = Ct Compra ÷ (1 − custos de venda − margem alvo). Os custos de venda do item são (CMV − Ct Compra) ÷ Valor. O ganho considera a mesma quantidade vendida.">i</span></label><input id="planM" type="number" value="5" step=".5"></div>
+  <div class="field"><label>Faixa de aumento</label><select id="planF"><option value="">Todas</option><option value="a">Até 5%</option><option value="b">De 5% a 10%</option><option value="c">Acima de 10%</option><option value="s">Verificar cadastro</option></select></div>
+  <div class="field"><label>Curva (faturamento)</label><select id="planC"><option value="">Todas</option><option>A</option><option>B</option><option>C</option></select></div>
+ </div>
+ <p class="note" id="planNote"></p><div class="kpis" id="planKpis" style="margin-top:12px"></div>
+ <div class="tablewrap"><table><thead id="planHead"></thead><tbody id="planBody"></tbody></table></div><div id="planMore" style="margin-top:10px"></div></details>
 <details class="card" id="mixbox"><summary style="cursor:pointer;font-weight:700;font-size:16px">🎯 Sugestão Inteligente de Mix de Ofertas</summary>
  <div class="controls" style="margin-top:14px">
   <div class="field"><label>Itens no encarte <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Tamanho do encarte. A divisão é fixa: 20% itens âncora (alto giro, margem de oferta de 2% a 5%), 50% giro médio (margem atual de 8% a 12%, desconto leve de 4%) e 30% margem alta (acima de 15%, desconto de 2%).">i</span></label><input id="mixN" type="number" value="20" min="5" step="1"></div>
@@ -143,10 +159,11 @@ function classify(r){
   else if(r.profitOff>0){r.offWhy=`Oferta lucrativa: ${money(r.profitOff)}, margem ${pct(r.marginOff)} mesmo com preço reduzido`;r.offAct='Manter oferta';r.offCls='good'}
   else{r.offWhy='Oferta sem lucro (resultado zero)';r.offAct='Revisar viabilidade da promoção';r.offCls='warn'}}
  const target=P('targetMargin'), vol=P('minVol')/100, hi=P('highMult'), lq=P('lowQty')/100, cap=P('cap')/100;
- r.targetPrice=r.costUnit/(1-target/100);
- const need=r.price>0?Math.max(0,r.targetPrice/r.price-1):0;
+ r.vr=0;let cu=r.costUnit;if($('costMode').value==='erp'&&r.ctC>0&&r.rev>0&&r.qty>0){cu=r.ctC/r.qty;r.vr=Math.max(0,(r.cmv-r.ctC)/r.rev)}
+ const den=1-r.vr-target/100;r.targetPrice=den>0.02&&cu>0?cu/den:NaN;
+ const need=r.price>0?(isFinite(r.targetPrice)?Math.max(0,r.targetPrice/r.price-1):Infinity):0;
  const rate=r.margin<target?Math.min(need,cap):cap;
- r.rate=rate; r.pot=Math.max(0,r.rev*rate);
+ r.rate=rate; r.pot=Math.max(0,r.rev*rate*(1-r.vr));
  const qx=med.qty?r.qty/med.qty:0, cx=med.cust?r.customers/med.cust:0;
  const sells=r.qty>=med.qty*vol||r.rev>=med.rev*vol;
  const highCust=med.cust?cx>=1.5:true;
@@ -172,7 +189,7 @@ function build(){
  rows.filter(r=>r.diag===5).sort((a,b)=>b.pot-a.pot).forEach((r,i)=>{r.act=i<10?'Prioridade alta':i<30?'Prioridade média':'Prioridade baixa';r.cls=i<10?'good':'warn'});
  $('app').style.display='block';
  abcCalc(rows,'rev');abcCalc(rows,'profit');abcCalc(rows,'qty');rows.forEach(r=>r.abc=r.abc_rev);
- renderKpis();renderTabs();render();renderMix();renderGrp();renderAbc();
+ renderKpis();renderTabs();render();renderMix();renderGrp();renderAbc();renderPlan();
  $('rules').innerHTML=
  '<p><b>1. Prejuízo:</b> lucro &lt; 0.</p>'+
  '<p><b>2. Margem ruim que vende:</b> margem &lt; '+pct(P('targetMargin'))+' e (qtde ou faturamento) ≥ '+pct(P('minVol'))+' da mediana.</p>'+
@@ -237,7 +254,7 @@ function render(keep){if(keep!==true)lim=200;
    return `<tr>${desc(r)}<td>${num(c.qa)}</td><td>${num(c.qb)}</td><td>${vf(vp(c.qa,c.qb))}</td><td class="${c.la<0?'bad':''}">${money(c.la)}</td><td class="${c.lb<0?'bad':''}">${money(c.lb)}</td><td>${vf(vp(c.la,c.lb))}</td></tr>`}).join('');
  }else{
   head=STD_HEAD;
-  body=vis.map(r=>`<tr>${desc(r)}<td class="l">${esc(r.grp||'')}</td><td class="l">${esc(r.sup||'')}</td><td>${r.abc||''}</td><td>${num(r.qty)}</td><td>${money(r.rev)}</td><td class="${r.profit<0?'bad':''}">${money(r.profit)}</td><td class="${r.margin<0?'bad':r.margin<crit?'warn':'good'}">${pct(r.margin)}</td><td class="${r.marginErp<0?'bad':''}">${pct(r.marginErp)}</td><td>${num(r.customers)}</td><td class="${r.offer&&r.profitOff<0?'bad':''}">${r.offer?money(r.profitOff):'—'}</td><td>${money(r.price)}</td><td>${money(r.targetPrice)}</td><td>${money(r.pot)}</td><td class="l">${O?'🏷️ '+esc(r.offWhy):DIAGS[r.diag].n.split(' ')[0]+' '+esc(r.why)}</td><td class="l ${O?r.offCls:r.cls}">${O?r.offAct:r.act}</td></tr>`).join('');
+  body=vis.map(r=>`<tr>${desc(r)}<td class="l">${esc(r.grp||'')}</td><td class="l">${esc(r.sup||'')}</td><td>${r.abc||''}</td><td>${num(r.qty)}</td><td>${money(r.rev)}</td><td class="${r.profit<0?'bad':''}">${money(r.profit)}</td><td class="${r.margin<0?'bad':r.margin<crit?'warn':'good'}">${pct(r.margin)}</td><td class="${r.marginErp<0?'bad':''}">${pct(r.marginErp)}</td><td>${num(r.customers)}</td><td class="${r.offer&&r.profitOff<0?'bad':''}">${r.offer?money(r.profitOff):'—'}</td><td>${money(r.price)}</td><td>${isFinite(r.targetPrice)?money(r.targetPrice):'—'}</td><td>${money(r.pot)}</td><td class="l">${O?'🏷️ '+esc(r.offWhy):DIAGS[r.diag].n.split(' ')[0]+' '+esc(r.why)}</td><td class="l ${O?r.offCls:r.cls}">${O?r.offAct:r.act}</td></tr>`).join('');
  }
  let ci=0;head=head.replace(/<th/g,()=>`<th data-c="${ci++}"`);
  $('thead').innerHTML=head;$('tbody').innerHTML=body;
@@ -290,18 +307,18 @@ function parseFile(f){return new Promise((ok,no)=>{const rd=new FileReader();rd.
  if(!data.length) throw Error(f.name+': planilha vazia');
  const find=names=>Object.keys(data[0]).find(x=>names.some(n=>x.trim().toLowerCase()===n));
  const keys=Object.keys(data[0]),nm=t=>String(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLowerCase(),ofk=(w,dw)=>keys.find(x=>{const n=nm(x);return n.includes(w)&&n.includes('oferta')})||keys.filter(x=>nm(x).replace(/_\d+$/,'')===dw)[1];
- const k={code:find(['código','codigo']),desc:find(['descricao','descrição']),qty:find(['qtde','quantidade']),rev:find(['valor','faturamento','venda']),cmv:find(['cmv']),profit:find(['valor lucro','lucro']),cmvOff:ofk('cmv','cmv'),profitOff:ofk('lucro','valor lucro'),cust:find(['núm. clientes','num. clientes','clientes']),grp:find(['grupo']),sup:find(['nome últ.','nome ult.','nome últ','fornecedor']),ean:find(['código barras','codigo barras','ean']),ctE:keys.find(x=>nm(x).replace(/_\d+$/,'')==='ct empresa')};
+ const k={code:find(['código','codigo']),desc:find(['descricao','descrição']),qty:find(['qtde','quantidade']),rev:find(['valor','faturamento','venda']),cmv:find(['cmv']),profit:find(['valor lucro','lucro']),cmvOff:ofk('cmv','cmv'),profitOff:ofk('lucro','valor lucro'),cust:find(['núm. clientes','num. clientes','clientes']),grp:find(['grupo']),sup:find(['nome últ.','nome ult.','nome últ','fornecedor']),ean:find(['código barras','codigo barras','ean']),ctE:keys.find(x=>nm(x).replace(/_\d+$/,'')==='ct empresa'),ctC:keys.find(x=>nm(x).replace(/_\d+$/,'')==='ct compra')};
  if(!k.qty||!k.rev||!k.cmv) throw Error(f.name+': não encontrei as colunas necessárias (quantidade, valor/faturamento e CMV).');
  const g=(x,c)=>c?cleanNum(x[c]):0;
  let fb=0;const cm=$('costMode').value;
  const rs=data.map(x=>{const rev=g(x,k.rev),cmvR=g(x,k.cmv),ce=k.ctE?g(x,k.ctE):0,cOffR=g(x,k.cmvOff),pOffR=g(x,k.profitOff);
   const erp={cmv:cmvR,profit:k.profit?g(x,k.profit):rev-cmvR,cmvOff:cOffR,profitOff:pOffR};let emp=null;
   if(k.ctE&&ce>0){emp={cmv:ce,profit:rev-ce,cmvOff:cOffR,profitOff:pOffR};if(cOffR>0){emp.cmvOff=cmvR>0?ce*cOffR/cmvR:ce;emp.profitOff=(cOffR+pOffR)-emp.cmvOff}}else if(k.ctE)fb++;
-  const row={code:k.code?x[k.code]:'',desc:k.desc?String(x[k.desc]):'',grp:k.grp?String(x[k.grp]).trim():'',sup:k.sup?String(x[k.sup]).trim():'',ean:k.ean?String(x[k.ean]).trim():'',qty:g(x,k.qty),rev,customers:g(x,k.cust),alt:{erp,emp},profitErp:erp.profit};
+  const row={code:k.code?x[k.code]:'',desc:k.desc?String(x[k.desc]):'',grp:k.grp?String(x[k.grp]).trim():'',sup:k.sup?String(x[k.sup]).trim():'',ean:k.ean?String(x[k.ean]).trim():'',qty:g(x,k.qty),rev,customers:g(x,k.cust),alt:{erp,emp},profitErp:erp.profit,cmvErp:erp.cmv,ctC:k.ctC?g(x,k.ctC):0};
   setCost(row,cm);return row}).filter(r=>r.qty||r.rev||r.cmv);
  ok({name:f.name,date:fileDate(f),rows:rs,offCols:[k.cmvOff,k.profitOff],costInfo:{col:k.ctE,fb}})}catch(err){no(err)}};rd.readAsArrayBuffer(f)})}
 function aggregate(from,to){
- const m=new Map(),F=['qty','rev','cmv','profit','cmvOff','profitOff','customers','profitErp'];
+ const m=new Map(),F=['qty','rev','cmv','profit','cmvOff','profitOff','customers','profitErp','ctC','cmvErp'];
  files.filter(f=>mode()===1||((!from||f.date>=from)&&(!to||f.date<=to))).forEach(f=>f.rows.forEach(x=>{
   const key=x.code+'|'+x.desc;let a=m.get(key);if(!a){a={code:x.code,desc:x.desc,key,grp:x.grp,sup:x.sup,ean:x.ean};F.forEach(c=>a[c]=0);m.set(key,a)}F.forEach(c=>a[c]+=x[c])}));
  return [...m.values()].map(a=>(a.margin=a.rev?a.profit/a.rev*100:0,a.marginErp=a.rev?a.profitErp/a.rev*100:0,a.price=a.qty?a.rev/a.qty:0,a.costUnit=a.qty?a.cmv/a.qty:0,a));
@@ -335,15 +352,17 @@ function initPeriods(reset){
 }
 document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',()=>{$('file').multiple=mode()===2;$('file').value='';$('vmode').value='std';$('dayf').innerHTML='';qf='';files=[];rows=[];$('app').style.display='none';$('status').textContent=mode()===2?'Selecione os arquivos de todos os dias e clique em Analisar.':'Envie o relatório para começar.'}));
 $('file').addEventListener('change',()=>$('status').textContent='Arquivo(s) selecionado(s). Clique em Analisar.');
+function finishLoad(src){
+ const n=files.reduce((a,f)=>a+f.rows.length,0),no=files.reduce((a,f)=>a+f.rows.filter(r=>r.cmvOff>0).length,0),oc=files[0].offCols||['',''],ci=files[0].costInfo||{};
+ const cl=' Custo usado: '+(ci.col?costLabel(ci):'CMV do relatório (coluna Ct Empresa não encontrada).');
+ $('status').textContent=src==='hist'?`Carregado do histórico: ${files.length} dia(s), ${n.toLocaleString('pt-BR')} linhas, ${no.toLocaleString('pt-BR')} em oferta (CMV Oferta > 0).`+cl
+  :`Carregado: ${files.length} arquivo(s), ${n.toLocaleString('pt-BR')} linhas. Colunas de oferta lidas: "${oc[0]}" (CMV) e "${oc[1]}" (lucro) → ${no.toLocaleString('pt-BR')} linhas em oferta (CMV Oferta > 0).`+(no?'':' ATENÇÃO: nenhuma linha com CMV Oferta > 0; confira se essas colunas são as corretas.')+cl;
+ $('periodCard').style.display=mode()===2?'block':'none';current=0;
+ if(mode()===2){renderFiles();initPeriods(true)}else runAnalysis();
+}
 $('loadBtn').addEventListener('click',async()=>{
  const fs=[...$('file').files];if(!fs.length){alert('Selecione um arquivo.');return}
- try{files=await Promise.all((mode()===1?fs.slice(0,1):fs).map(parseFile));
-  const n=files.reduce((s,f)=>s+f.rows.length,0);
-  const no=files.reduce((s,f)=>s+f.rows.filter(r=>r.cmvOff>0).length,0),oc=files[0].offCols,ci=files[0].costInfo;
-  $('status').textContent=`Carregado: ${files.length} arquivo(s), ${n.toLocaleString('pt-BR')} linhas. Colunas de oferta lidas: "${oc[0]}" (CMV) e "${oc[1]}" (lucro) → ${no.toLocaleString('pt-BR')} linhas em oferta (CMV Oferta > 0).`+(no?'':' ATENÇÃO: nenhuma linha com CMV Oferta > 0; confira se essas colunas são as corretas.')+' Custo usado: '+(ci.col?costLabel(ci):'CMV do relatório (coluna Ct Empresa não encontrada).');
-  $('periodCard').style.display=mode()===2?'block':'none';current=0;
-  if(mode()===2){renderFiles();initPeriods(true)}else runAnalysis();
- }catch(err){alert(err.message);console.error(err)}
+ try{files=await Promise.all((mode()===1?fs.slice(0,1):fs).map(parseFile));finishLoad()}catch(err){alert(err.message);console.error(err)}
 });
 ['aFrom','aTo','bFrom','bTo'].forEach(id=>$(id).addEventListener('change',runAnalysis));
 $('splitBtn').addEventListener('click',()=>{const d=alldays();if(d.length<2){alert('Carregue pelo menos 2 dias.');return}const h=Math.ceil(d.length/2);$('aFrom').value=d[0];$('aTo').value=d[h-1];$('bFrom').value=d[h];$('bTo').value=d[d.length-1];$('vmode').value='cmp';runAnalysis()});
@@ -386,7 +405,7 @@ const ncode=c=>String(c).trim().replace(/^0+/,'');
 const PROMO=/(\d+)\s*(?:un\w*\.?|pcs?|p[cç]\w*)?\s*por\s*(?:r\$)?\s*(\d+(?:[.,]\d+)?)/i;
 const readBuf=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsArrayBuffer(f)});
 function costBase(){
- const m=new Map();[...files].sort((a,b)=>a.date<b.date?-1:1).forEach(f=>f.rows.forEach(r=>{if(r.qty>0&&r.cmv>0&&r.rev>0)m.set(r.code+'|'+r.desc,{code:r.code,desc:r.desc,cost:r.cmv/r.qty,price:r.rev/r.qty})}));
+ const m=new Map();[...files].sort((a,b)=>a.date<b.date?-1:1).forEach(f=>f.rows.forEach(r=>{if(r.qty>0&&r.cmv>0&&r.rev>0)m.set(r.code+'|'+r.desc,{code:r.code,desc:r.desc,cost:r.cmv/r.qty,price:r.rev/r.qty,ctc:r.ctC>0?r.ctC/r.qty:0,vr:r.ctC>0&&r.rev>0?Math.max(0,(r.cmvErp-r.ctC)/r.rev):0})}));
  const L=[...m.values()],byCode=new Map();L.forEach(b=>{b.t=toks(b.desc);if(String(b.code).trim()!=='')byCode.set(ncode(b.code),b)});return{L,byCode};
 }
 function findBase(o,B){
@@ -398,10 +417,11 @@ function findBase(o,B){
 function evalOffer(o,B,minM){
  const m=findBase(o,B),unit=o.total/o.qty;
  if(!m)return{o,unit,ref:o.reg>0?o.reg:null,st:'N',sug:(o.note?o.note+' | ':'')+'Sem custo na base: item não encontrado nos relatórios carregados. Confira código/descrição.'};
- const ref=o.reg>0?o.reg:m.b.price,c=m.b.cost,mg=(1-c/unit)*100,res=o.total-o.qty*c,st=mg<0?'R':mg<minM?'Y':'G';let sug='OK';
- if(st!=='G'){let q=o.qty-1;while(q>=1&&((1-c*q/o.total)*100<minM||o.total/q>ref*.99))q--;
-  if(q>=1)sug=`Mudar de ${o.qty} por ${money(o.total)} para ${q} por ${money(o.total)} (unit. ${money(o.total/q)}, margem ${pct((1-c*q/o.total)*100)}) ou remover da campanha`;
-  else{const pu=c/(1-minM/100);sug=pu>=ref*.98?`Remover da campanha: nem perto do ${o.reg>0?'preço normal':'preço médio praticado'} (${money(ref)}) sobra margem de ${pct(minM)}`:`Subir para ${o.qty>1?o.qty+' por ':''}${money(pu*o.qty)} (unit. ${money(pu)}) ou remover da campanha`}}
+ const b=m.b,erp=$('costMode').value==='erp'&&b.ctc>0,ref=o.reg>0?o.reg:b.price,cAt=u=>erp?b.ctc+b.vr*u:b.cost,mgAt=u=>(1-cAt(u)/u)*100;
+ const c=cAt(unit),mg=mgAt(unit),res=o.total-o.qty*c,st=mg<0?'R':mg<minM?'Y':'G';let sug='OK';
+ if(st!=='G'){let q=o.qty-1;while(q>=1&&(mgAt(o.total/q)<minM||o.total/q>ref*.99))q--;
+  if(q>=1)sug=`Mudar de ${o.qty} por ${money(o.total)} para ${q} por ${money(o.total)} (unit. ${money(o.total/q)}, margem ${pct(mgAt(o.total/q))}) ou remover da campanha`;
+  else{const den=erp?1-b.vr-minM/100:1-minM/100,pu=den>0.02?(erp?b.ctc:b.cost)/den:Infinity;sug=pu>=ref*.98?`Remover da campanha: nem perto do ${o.reg>0?'preço normal':'preço médio praticado'} (${money(ref)}) sobra margem de ${pct(minM)}`:`Subir para ${o.qty>1?o.qty+' por ':''}${money(pu*o.qty)} (unit. ${money(pu)}) ou remover da campanha`}}
  if(o.note)sug=o.note+' | '+sug;return{o,b:m.b,how:m.how,unit,ref,c,mg,res,st,sug};
 }
 function aoaToObjs(a){
@@ -502,12 +522,15 @@ function addAnalysisSheets(wb){
   for(let i=1;i<=b.length;i++)f.forEach((z,k)=>{const c=ws[XLSX.utils.encode_cell({r:i,c:k})];if(z&&c)c.z=z});XLSX.utils.book_append_sheet(wb,ws,name)};
  [['grp','Grupos'],['sup','Fornecedores']].forEach(([by,name])=>mk([name.slice(0,-1)==='Grupo'?'Grupo':'Fornecedor','Itens','Itens A','Qtde','Faturamento','% do faturamento','Lucro','Margem','Itens em prejuízo','Perda com prejuízo','Itens em oferta','Perda em ofertas'],
   grpData(by).sort((a,b)=>b.rev-a.rev).map(g=>[g.n,g.it,g.A,g.qty,g.rev,g.sh/100,g.pr,g.mg/100,g.neg,g.loss,g.off,g.offLoss]),[null,'#,##0','#,##0','#,##0.00',M,'0.0%',M,'0.0%','#,##0',M,'#,##0',M],[34,9,9,12,16,12,16,9,12,16,12,16],name));
+ {const D=planData().list.sort((a,b)=>(b.f==='s'?-2:isFinite(b.gT)?b.gT:-1)-(a.f==='s'?-2:isFinite(a.gT)?a.gT:-1));if(D.length)mk(['Curva','Código','Descrição','Grupo','Fornecedor','Qtde','Preço atual','Preço de equilíbrio','Preço p/ meta','Aumento p/ meta','Margem sistema','Ganho p/ empate','Ganho p/ meta','Em oferta','Ação sugerida'],D.map(x=>[x.abc,x.code,x.desc,x.grp,x.sup,x.qty,x.p,x.pbe,isFinite(x.pt)?x.pt:'',isFinite(x.up)?x.up:'',x.mg/100,x.gBE,isFinite(x.gT)?x.gT:'',x.offer?'Sim':'Não',x.act]),[null,null,null,null,null,'#,##0.00',M,M,M,'0.0%','0.0%',M,M,null,null],[8,12,42,24,30,10,13,15,13,13,13,15,15,10,50],'Plano de preços')}
  mk(['Código','Descrição','Grupo','Fornecedor','Curva (faturamento)','% acum. faturamento','Curva (lucro)','% acum. lucro','Curva (quantidade)','% acum. quantidade','Qtde','Faturamento','Lucro','Margem'],[...rows].sort((a,b)=>b.rev-a.rev).map(r=>[r.code,r.desc,r.grp||'',r.sup||'',r.abc_rev,r.cum_rev/100,r.abc_profit,r.cum_profit/100,r.abc_qty,r.cum_qty/100,r.qty,r.rev,r.profit,r.margin/100]),[null,null,null,null,null,'0.0%',null,'0.0%',null,'0.0%','#,##0.00',M,M,'0.0%'],[12,42,24,30,12,12,12,12,12,12,12,16,16,9],'Curva ABC');
 }
-['grp','abc'].forEach(id=>$(id+'Head').addEventListener('click',e=>{const th=e.target.closest('th[data-c]');if(!th)return;const st=SORTST[id]||(SORTST[id]={c:-1,d:1}),c=+th.dataset.c;
- if(st.c===c){if(st.d===1)st.d=-1;else{st.c=-1;st.d=1}}else{st.c=c;st.d=1}(id==='grp'?renderGrp:renderAbc)()}));
+['grp','abc','plan'].forEach(id=>$(id+'Head').addEventListener('click',e=>{const th=e.target.closest('th[data-c]');if(!th)return;const st=SORTST[id]||(SORTST[id]={c:-1,d:1}),c=+th.dataset.c;
+ if(st.c===c){if(st.d===1)st.d=-1;else{st.c=-1;st.d=1}}else{st.c=c;st.d=1}({grp:renderGrp,abc:renderAbc,plan:renderPlan})[id]()}));
 $('grpBody').addEventListener('click',e=>{const a=e.target.closest('a[data-g]');if(!a)return;e.preventDefault();$('search').value=decodeURIComponent(a.dataset.g);current=0;hsort=null;renderTabs();render();$('tabs').scrollIntoView({behavior:'smooth'})});
 $('abcMore').addEventListener('click',e=>{const b=e.target.closest('[data-more]');if(!b)return;abcLim=b.dataset.more==='all'?1e9:abcLim+500;renderAbc(true)});
+$('planbox').addEventListener('toggle',()=>renderPlan());['planM','planF','planC'].forEach(id=>$(id).addEventListener('change',()=>renderPlan()));
+$('planMore').addEventListener('click',e=>{const b=e.target.closest('[data-more]');if(!b)return;planLim=b.dataset.more==='all'?1e9:planLim+300;renderPlan(true)});
 $('grpbox').addEventListener('toggle',renderGrp);$('abcbox').addEventListener('toggle',()=>renderAbc());
 $('grpBy').addEventListener('change',()=>{SORTST.grp={c:4,d:-1};renderGrp()});$('grpQ').addEventListener('input',renderGrp);
 $('abcBase').addEventListener('change',()=>renderAbc());$('abcCls').addEventListener('change',()=>renderAbc());
@@ -519,14 +542,41 @@ const dlErr=e=>{if(e&&e.code!=='declined')alert('Não foi possível salvar o arq
 async function saveWb(wb,name){const dl=await getDl();if(!dl){XLSX.writeFile(wb,name);return}try{await dl.save({filename:name,data:XLSX.write(wb,{bookType:'xlsx',type:'array'})})}catch(e){dlErr(e)}}
 async function saveText(name,text){const dl=await getDl();if(dl){try{await dl.save({filename:name,data:text})}catch(e){dlErr(e)}return}
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;a.click()}
-let encName='';let st;$('search').addEventListener('input',()=>{clearTimeout(st);st=setTimeout(render,250)});
+let encName='';
+let planLim=200;
+function planData(){
+ const m=P('planM')/100,list=[];let semCt=0,tP=0,tR=0;
+ rows.forEach(r=>{
+  tP+=r.profitErp;tR+=r.rev;
+  if(!(r.qty>0&&r.rev>0))return;if(!(r.ctC>0)){semCt++;return}
+  const c=r.ctC/r.qty,v=Math.max(0,(r.cmvErp-r.ctC)/r.rev),p=r.price,mg=r.profitErp/r.rev,d0=1-v,dT=1-v-m;
+  if(mg>=m||d0<=0.02)return;
+  const pbe=c/d0,pt=dT>0.02?c/dT:NaN,up=isFinite(pt)?pt/p-1:Infinity,gBE=Math.max(0,r.qty*(pbe-p)*d0),gT=isFinite(pt)?r.qty*(pt-p)*d0:NaN;
+  const sus=mg<-0.5||up>1,f=sus?'s':up<=.05?'a':up<=.10?'b':'c';
+  const act=sus?'Verificar cadastro/unidade antes de mexer no preço':r.offer&&r.profitOff<0?'Rever ou retirar da oferta':f==='a'?'Reajustar preço':f==='b'?'Reajustar em etapas e checar a concorrência':(r.abc==='A'?'Renegociar custo com o fornecedor ou reposicionar preço':'Avaliar tirar do mix ou renegociar custo');
+  list.push({r,code:r.code,desc:r.desc,grp:r.grp||'',sup:r.sup||'',abc:r.abc||'',qty:r.qty,p,pbe,pt,up,mg:mg*100,gBE,gT,f,act,offer:r.offer});
+ });
+ return{list,semCt,tP,tR};
+}
+const PCOLS=[{h:'Curva',v:x=>x.abc},{h:'Código',l:1,v:x=>String(x.code)},{h:'Descrição',l:1,v:x=>x.desc,f:x=>esc(x.desc)+(x.offer?'<span class="badge">Em Oferta</span>':'')},{h:'Grupo',l:1,v:x=>x.grp,f:x=>esc(x.grp)},{h:'Fornecedor',l:1,v:x=>x.sup,f:x=>esc(x.sup)},{h:'Qtde',v:x=>x.qty,f:x=>num(x.qty)},{h:'Preço atual',v:x=>x.p,f:x=>money(x.p)},{h:'Preço de equilíbrio',v:x=>x.pbe,f:x=>money(x.pbe)},{h:'Preço p/ meta',v:x=>isFinite(x.pt)?x.pt:1e9,f:x=>isFinite(x.pt)?money(x.pt):'—'},{h:'Aumento p/ meta',v:x=>isFinite(x.up)?x.up:1e9,f:x=>isFinite(x.up)?'+'+pct(x.up*100):'—',k:x=>x.up>.1?'bad':x.up>.05?'warn':'good'},{h:'Margem sistema',v:x=>x.mg,f:x=>pct(x.mg),k:x=>x.mg<0?'bad':'warn'},{h:'Ganho p/ empate',v:x=>x.gBE,f:x=>money(x.gBE)},{h:'Ganho p/ meta',v:x=>x.f==='s'?-2:isFinite(x.gT)?x.gT:-1,f:x=>isFinite(x.gT)?money(x.gT):'—'},{h:'Ação sugerida',l:1,v:x=>x.act}];
+function renderPlan(keep){
+ if(!$('planbox').open||!rows.length)return;if(keep!==true)planLim=200;
+ const D=planData(),F=$('planF').value,C=$('planC').value,L=D.list.filter(x=>(!F||x.f===F)&&(!C||x.abc===C));
+ const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0),all=D.list,n=k=>all.filter(x=>x.f===k).length,gT=sum(all,x=>x.f!=='s'&&isFinite(x.gT)?x.gT:0),gB=sum(all,x=>x.f!=='s'?x.gBE:0);
+ $('planNote').textContent=`Itens abaixo da margem alvo, calculados com o Ct Compra e os custos de venda do próprio item (ICMS de saída e custo operacional, proporcionais ao preço), independentemente do campo "Custo usado". Ganho a quantidades constantes; os totais de ganho não incluem os itens de "Verificar cadastro" (provável erro de unidade ou de cadastro), que ficam no fim da lista.`+(D.semCt?` ${D.semCt} itens sem Ct Compra no arquivo foram ignorados (históricos salvos antes dessa coluna precisam ser salvos de novo).`:'');
+ $('planKpis').innerHTML=[['Itens no plano',num(all.length)],['Até 5% | 5–10% | acima de 10%',`${n('a')} | ${n('b')} | ${n('c')}`],['Verificar cadastro',num(n('s'))],['Ganho p/ empate (R$)',money(gB)],['Ganho p/ meta (R$)',money(gT)],['Margem sistema: hoje → com a meta',pct(D.tR?D.tP/D.tR*100:0)+' → '+pct(D.tR?(D.tP+gT)/D.tR*100:0)]].map(a=>`<div class="kpi"><small>${a[0]}</small><b style="font-size:17px">${a[1]}</b></div>`).join('');
+ if(!SORTST.plan)SORTST.plan={c:12,d:-1};
+ const tot=tbl('plan',PCOLS,L,planLim);
+ $('planMore').innerHTML=tot>planLim?`<button data-more="1">Mostrar mais 300</button> <button data-more="all">Mostrar todos (${tot})</button>`:'';
+}
+let st;$('search').addEventListener('input',()=>{clearTimeout(st);st=setTimeout(render,250)});
 $('thead').addEventListener('click',e=>{const th=e.target.closest('th[data-c]');if(!th)return;const c=+th.dataset.c,vm=mode()===2?$('vmode').value:'std';if(hsort&&hsort.vm===vm&&hsort.c===c){if(hsort.dir===1)hsort.dir=-1;else hsort=null}else hsort={vm,c,dir:1};render()});
 $('sort').addEventListener('change',()=>{hsort=null;render()});
 $('topn').addEventListener('change',render);
 ['targetMargin','criticalMargin','minVol','highMult','lowQty','cap'].forEach(id=>$(id).addEventListener('change',()=>{if(rows.length)build()}));
 const COLS=[['Diagnóstico',16,null,r=>DIAGS[r.diag].n.replace(/^\S+\s/,'')],['Código',12,null,r=>r.code],['Descrição',42,null,r=>r.desc],['Grupo',24,null,r=>r.grp||''],['Fornecedor',30,null,r=>r.sup||''],['Curva ABC',10,null,r=>r.abc||''],
 ['Qtde',11,'#,##0.00',r=>r.qty],['Faturamento',15,'"R$" #,##0.00',r=>r.rev],['CMV',15,'"R$" #,##0.00',r=>r.cmv],['Lucro',15,'"R$" #,##0.00',r=>r.profit],
-['Margem',10,'0.0%',r=>r.margin/100],['Margem sistema (ERP)',13,'0.0%',r=>(r.marginErp||0)/100],['Clientes',10,'#,##0',r=>r.customers],['Em oferta',10,null,r=>r.offer?'Sim':'Não'],['Lucro oferta',15,'"R$" #,##0.00',r=>r.offer?r.profitOff:0],['Preço atual',13,'"R$" #,##0.00',r=>r.price],['Preço p/ margem alvo',14,'"R$" #,##0.00',r=>r.targetPrice],
+['Margem',10,'0.0%',r=>r.margin/100],['Margem sistema (ERP)',13,'0.0%',r=>(r.marginErp||0)/100],['Clientes',10,'#,##0',r=>r.customers],['Em oferta',10,null,r=>r.offer?'Sim':'Não'],['Lucro oferta',15,'"R$" #,##0.00',r=>r.offer?r.profitOff:0],['Preço atual',13,'"R$" #,##0.00',r=>r.price],['Preço p/ margem alvo',14,'"R$" #,##0.00',r=>isFinite(r.targetPrice)?r.targetPrice:''],
 ['Reajuste simulado',12,'0.0%',r=>r.rate],['Potencial R$',15,'"R$" #,##0.00',r=>r.pot],['Por que está aqui?',60,null,r=>OFFMODE&&r.offer?r.offWhy:r.why],['Ação',32,null,r=>OFFMODE&&r.offer?r.offAct:r.act]];
 const QFN={drop:'Queda de giro',off:'Apenas em oferta',out:'Ruptura / sem venda'};
 function matrixSheet(list){
@@ -579,5 +629,70 @@ $('csvBtn').addEventListener('click',()=>{
  const lines=[COLS.map(c=>'"'+c[0]+'"').join(';'),...view.map(r=>COLS.map(c=>f(c[3](r))).join(';'))];
  saveText('diagnostico_itens.csv','\ufeff'+lines.join('\r\n'));
 });
+
+/* ====== Histórico (Supabase) — preencha as duas linhas abaixo ====== */
+const SB_URL='https://prwsexzspskwcgmgmpae.supabase.co',SB_KEY='sb_publishable_4_s9CKzUE0_hXdokcNslLA_DhBTAvgW';
+/* ==================================================================== */
+let sb=null,isEd=false,hUid=null;
+const R4=v=>Math.round((+v||0)*1e4)/1e4,hMsg=t=>{$('histMsg').textContent=t};
+const encRows=rs=>rs.map(r=>{const e=r.alt.erp,m=r.alt.emp;return[r.code,r.desc,r.grp,r.sup,r.ean,R4(r.qty),R4(r.rev),R4(r.customers),R4(e.cmv),R4(e.profit),R4(e.cmvOff),R4(e.profitOff),...(m?[R4(m.cmv),R4(m.profit),R4(m.cmvOff),R4(m.profitOff)]:[null,null,null,null]),R4(r.ctC)]});
+const decRows=(a,cm)=>a.map(x=>{const r={code:x[0],desc:x[1],grp:x[2],sup:x[3],ean:x[4],qty:x[5],rev:x[6],customers:x[7],alt:{erp:{cmv:x[8],profit:x[9],cmvOff:x[10],profitOff:x[11]},emp:x[12]==null?null:{cmv:x[12],profit:x[13],cmvOff:x[14],profitOff:x[15]}},profitErp:x[9],cmvErp:x[8],ctC:x[16]||0};setCost(r,cm);return r});
+const hSel=()=>[...document.querySelectorAll('#hBody input[data-d]:checked')].map(x=>x.dataset.d);
+async function hInit(){
+ if(!SB_URL||!SB_KEY){hMsg('Histórico não configurado: preencha SB_URL e SB_KEY no início do script do arquivo.');return}
+ if(!window.supabase){hMsg('Não consegui carregar o Supabase (sem internet ou bloqueio da rede).');return}
+ sb=window.supabase.createClient(SB_URL,SB_KEY);
+ sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_IN'||ev==='SIGNED_OUT')setTimeout(()=>hSession(),0)});
+ await hSession();
+}
+async function hSession(){
+ const{data}=await sb.auth.getSession(),u=data.session&&data.session.user,uid=u?u.id||u.email:null;
+ if(uid===hUid&&hUid!==null)return;hUid=uid;
+ $('histLogin').style.display=u?'none':'flex';$('histBox').style.display=u?'block':'none';$('histUser').textContent=u?u.email:'';
+ if(!u){isEd=false;hMsg('Entre com o e-mail e a senha que você recebeu para ver o histórico.');return}
+ const r=await sb.rpc('is_editor'),mm=await sb.rpc('is_member');isEd=r.data===true;$('hSave').style.display=$('hDel').style.display=isEd?'':'none';
+ if(mm.error){hMsg('Erro ao verificar a permissão: '+mm.error.message);return}
+ if(mm.data!==true){$('hBody').innerHTML='';hMsg('O e-mail '+u.email+' não está na lista de acessos do histórico. Peça ao administrador para cadastrá-lo como leitor.');return}
+ hMsg(isEd?'Você pode salvar e excluir relatórios.':'Acesso somente para consulta.');await hList();
+}
+async function hList(){
+ const{data,error}=await sb.from('relatorios').select('data,nome_arquivo,criado_em,criado_por').order('data',{ascending:false});
+ if(error){hMsg('Erro ao listar: '+error.message);return}
+ $('hBody').innerHTML=data.length?data.map(h=>`<tr><td class="l"><input type="checkbox" data-d="${h.data}"></td><td class="l">${fmtD(h.data)}</td><td class="l">${esc(h.nome_arquivo||'')}</td><td class="l">${new Date(h.criado_em).toLocaleString('pt-BR')}</td><td class="l">${esc(h.criado_por||'')}</td></tr>`).join(''):'<tr><td class="l" colspan="5">Nenhum relatório salvo ainda.</td></tr>';
+ $('hAll').checked=false;
+}
+$('hLogin').addEventListener('click',async()=>{if(!sb)return;const{error}=await sb.auth.signInWithPassword({email:$('hEmail').value.trim(),password:$('hPass').value});if(error)alert('Não foi possível entrar: '+error.message);$('hPass').value=''});
+$('hPass').addEventListener('keydown',e=>{if(e.key==='Enter')$('hLogin').click()});
+$('hOut').addEventListener('click',()=>sb&&sb.auth.signOut());
+$('hRef').addEventListener('click',()=>sb&&hList());
+$('hAll').addEventListener('change',e=>document.querySelectorAll('#hBody input[data-d]').forEach(x=>x.checked=e.target.checked));
+$('hLoad').addEventListener('click',async()=>{
+ const ds=hSel();if(!ds.length){alert('Marque ao menos um dia na lista.');return}
+ hMsg('Carregando '+ds.length+' dia(s)...');
+ const{data,error}=await sb.from('relatorios').select('data,nome_arquivo,linhas,meta').in('data',ds).order('data');
+ if(error){hMsg('Erro ao carregar: '+error.message);return}
+ const m2=data.length>1,cm=$('costMode').value;
+ document.querySelector(`input[name=mode][value="${m2?2:1}"]`).checked=true;$('file').multiple=m2;$('file').value='';$('vmode').value='std';$('dayf').innerHTML='';qf='';
+ files=data.map(h=>({name:h.nome_arquivo||h.data,date:h.data,rows:decRows(h.linhas,cm),offCols:(h.meta&&h.meta.offCols)||['',''],costInfo:(h.meta&&h.meta.costInfo)||{}}));
+ finishLoad('hist');hMsg(isEd?'Você pode salvar e excluir relatórios.':'Acesso somente para consulta.');
+});
+$('hSave').addEventListener('click',async()=>{
+ if(!files.length){alert('Carregue e analise os arquivos antes de salvar.');return}
+ if(mode()===1){const d=prompt('Data deste relatório (AAAA-MM-DD):',files[0].date);if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d))return;files[0].date=d}
+ if(!confirm('Salvar no histórico (dias que já existem serão substituídos):\n\n'+files.map(f=>fmtD(f.date)+'  '+f.name).join('\n')))return;
+ for(const f of files){hMsg('Salvando '+fmtD(f.date)+'...');
+  const{error}=await sb.from('relatorios').upsert({data:f.date,nome_arquivo:f.name,linhas:encRows(f.rows),meta:{offCols:f.offCols,costInfo:f.costInfo}},{onConflict:'data'});
+  if(error){hMsg('Erro ao salvar '+f.name+': '+error.message);alert('Erro ao salvar '+f.name+': '+error.message);return}}
+ hMsg('Salvo no histórico.');await hList();
+});
+$('hDel').addEventListener('click',async()=>{
+ const ds=hSel();if(!ds.length){alert('Marque os dias que deseja excluir.');return}
+ if(!confirm('Excluir do histórico: '+ds.map(fmtD).join(', ')+'? Isso não pode ser desfeito.'))return;
+ const{data,error}=await sb.from('relatorios').delete().in('data',ds).select('data');
+ if(error){alert('Erro ao excluir: '+error.message);return}
+ if(!data||!data.length)alert('Nada foi excluído: sua conta não tem permissão de edição.');
+ await hList();
+});
+hInit();
 </script>
 </body></html>
