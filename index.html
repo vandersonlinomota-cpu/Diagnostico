@@ -22,7 +22,7 @@ input[type=file]{padding:7px} input[type=number]{width:120px}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}.tab{background:#f2f4f7;border:1px solid var(--line)}.tab.active{background:#eaf2ff;color:#175cd3;border-color:#b2ccff}
 .tablewrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:8px}
 th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}th{position:sticky;top:0;background:#f8fafc;z-index:1}
-.l{text-align:left!important}.badge{display:inline-block;background:#fef0c7;color:#93370d;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:700;margin-left:6px}.tip{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#eaf2ff;color:#175cd3;border:1px solid #b2ccff;font:700 10px Arial;margin-left:5px;cursor:help;vertical-align:middle;user-select:none}.tip:hover,.tip:focus{background:#175cd3;color:#fff;outline:none}#tipbox{position:fixed;display:none;max-width:300px;background:#101828;color:#fff;font-size:12px;line-height:1.5;font-weight:400;padding:10px 12px;border-radius:8px;box-shadow:0 4px 14px #0004;z-index:100;pointer-events:none}input[type=checkbox]{width:16px;height:16px}.rR td{background:#fef3f2}.rY td{background:#fffaeb}.rN td{background:#f2f4f7}.st{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}.stR{background:#fecdca;color:#912018}.stY{background:#fedf89;color:#93370d}.stG{background:#abefc6;color:#067647}.stN{background:#d0d5dd;color:#344054}.mode{display:flex;gap:16px;margin-bottom:14px;font-size:14px;font-weight:700}.mode label{font-size:14px;color:var(--text);display:flex;gap:6px;align-items:center}.mode input{height:auto}.fl{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:12px}.fl span{display:flex;gap:6px;align-items:center;background:#f2f4f7;padding:4px 8px;border-radius:8px}.fl input{height:30px}table.cmp{width:auto;margin-top:12px}table.cmp td,table.cmp th{text-align:right}
+.l{text-align:left!important}.badge{display:inline-block;background:#fef0c7;color:#93370d;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:700;margin-left:6px}.tip{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#eaf2ff;color:#175cd3;border:1px solid #b2ccff;font:700 10px Arial;margin-left:5px;cursor:help;vertical-align:middle;user-select:none}.tip:hover,.tip:focus{background:#175cd3;color:#fff;outline:none}#tipbox{position:fixed;display:none;max-width:300px;background:#101828;color:#fff;font-size:12px;line-height:1.5;font-weight:400;padding:10px 12px;border-radius:8px;box-shadow:0 4px 14px #0004;z-index:100;pointer-events:none}input[type=checkbox]{width:16px;height:16px}.colpanel{display:none;position:absolute;top:100%;left:0;z-index:30;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px #0002;padding:10px;max-height:320px;overflow:auto;min-width:220px}.colpanel label{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:400;color:var(--text);padding:3px 0;white-space:nowrap}.colpanel button{height:30px;margin-bottom:6px;width:100%}.rR td{background:#fef3f2}.rY td{background:#fffaeb}.rN td{background:#f2f4f7}.st{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}.stR{background:#fecdca;color:#912018}.stY{background:#fedf89;color:#93370d}.stG{background:#abefc6;color:#067647}.stN{background:#d0d5dd;color:#344054}.mode{display:flex;gap:16px;margin-bottom:14px;font-size:14px;font-weight:700}.mode label{font-size:14px;color:var(--text);display:flex;gap:6px;align-items:center}.mode input{height:auto}.fl{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:12px}.fl span{display:flex;gap:6px;align-items:center;background:#f2f4f7;padding:4px 8px;border-radius:8px}.fl input{height:30px}table.cmp{width:auto;margin-top:12px}table.cmp td,table.cmp th{text-align:right}
 .bad{color:var(--bad);font-weight:700}.warn{color:var(--warn);font-weight:700}.good{color:var(--good);font-weight:700}
 .note{font-size:12px;color:var(--muted);line-height:1.5}
 #status{margin-top:8px;color:var(--muted);font-size:13px}
@@ -31,7 +31,7 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
 </style>
 </head>
 <body>
-<header><h1>Diagnóstico de Itens</h1><p>Cada item aparece em uma única análise, seguindo a hierarquia: Prejuízo → Margem → Preço/Giro → Baixo giro → Oportunidade.</p></header>
+<header><h1>Diagnóstico de Itens</h1><p>Cada item aparece em uma única análise, seguindo a hierarquia: Prejuízo → Margem → Preço/Giro → Baixo giro → Oportunidade.</p><p style="margin-top:6px;font-size:11px;color:#94a3b8">Versão de 28/10/2026 · com ocultar colunas</p></header>
 <main>
 <div class="card">
   <div class="controls">
@@ -72,7 +72,7 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
     <option value="auto">Padrão da aba</option><option value="pot">Potencial R$</option><option value="qty">Quantidade</option><option value="rev">Faturamento</option><option value="margin">Margem</option><option value="profit">Lucro</option><option value="customers">Clientes</option><option value="poff">Lucro da oferta</option>
    </select></div>
    <div class="field"><label>Mostrar</label><select id="topn"><option value="0">Todos</option><option value="10">Top 10</option><option value="20">Top 20</option><option value="50">Top 50</option></select></div>
-   <div class="field" id="dfield" style="display:none"><label>Dia <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Escolha um dia para ver só as movimentações dele: KPIs, diagnósticos, medianas e a tabela são recalculados para esse dia. Também dá para clicar em uma barra do gráfico de evolução diária. Em Todo o período, tudo é acumulado (Período A).">i</span></label><select id="dayf"></select></div><div class="field" id="vfield" style="display:none"><label>Visão da tabela</label><select id="vmode"><option value="std">Diagnóstico (padrão)</option><option value="mat">Matriz por dia</option><option value="cmp">Comparar blocos A vs B</option></select></div><button class="primary" id="xlsBtn">Baixar Excel organizado</button><button id="csvBtn">CSV da aba atual</button>
+   <div class="field" id="dfield" style="display:none"><label>Dia <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Escolha um dia para ver só as movimentações dele: KPIs, diagnósticos, medianas e a tabela são recalculados para esse dia. Também dá para clicar em uma barra do gráfico de evolução diária. Em Todo o período, tudo é acumulado (Período A).">i</span></label><select id="dayf"></select></div><div class="field" id="vfield" style="display:none"><label>Visão da tabela</label><select id="vmode"><option value="std">Diagnóstico (padrão)</option><option value="mat">Matriz por dia</option><option value="cmp">Comparar blocos A vs B</option></select></div><div class="field colwrap" style="position:relative"><label>&nbsp;</label><button id="mainColBtn">Colunas ▾</button><div class="colpanel" id="mainColPanel"></div></div><button class="primary" id="xlsBtn">Baixar Excel organizado</button><button id="csvBtn">CSV da aba atual</button>
  </div>
  <div class="tabs" id="qf" style="display:none;margin:12px 0 0"><button class="tab" data-qf="drop">📉 Queda de giro</button><button class="tab" data-qf="off">🏷️ Apenas em oferta</button><button class="tab" data-qf="out">🚫 Ruptura / sem venda</button></div>
  <p class="note" id="explain"></p>
@@ -81,19 +81,19 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
 </div>
 <details class="card" id="grpbox"><summary style="cursor:pointer;font-weight:700;font-size:16px">🗂️ Análise por Grupo e Fornecedor</summary>
  <div class="controls" style="margin-top:14px"><div class="field"><label>Agrupar por</label><select id="grpBy"><option value="grp">Grupo</option><option value="sup">Fornecedor</option></select></div>
- <div class="field"><label>Buscar</label><input id="grpQ" placeholder="Nome do grupo/fornecedor"></div></div>
+ <div class="field"><label>Buscar</label><input id="grpQ" placeholder="Nome do grupo/fornecedor"></div><div class="field colwrap" style="position:relative"><label>&nbsp;</label><button id="grpColBtn">Colunas ▾</button><div class="colpanel" id="grpColPanel"></div></div></div>
  <p class="note" id="grpNote">Clique no título de uma coluna para ordenar. Clique em um nome para filtrar a tabela principal por ele. Perdas e margens usam o custo Ct Empresa.</p>
  <div class="tablewrap"><table><thead id="grpHead"></thead><tbody id="grpBody"></tbody></table></div></details>
 <details class="card" id="abcbox"><summary style="cursor:pointer;font-weight:700;font-size:16px">📈 Curva ABC</summary>
  <div class="controls" style="margin-top:14px"><div class="field"><label>Base da curva <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Faturamento: A = itens que somam os primeiros 80% do faturamento, B = até 95%, C = o resto. Lucro: mesma regra sobre o lucro; itens com lucro zero ou negativo ficam na classe C. Quantidade vendida: mesma regra sobre as unidades vendidas.">i</span></label><select id="abcBase"><option value="rev">Faturamento</option><option value="profit">Lucro</option><option value="qty">Quantidade vendida</option></select></div>
- <div class="field"><label>Classe</label><select id="abcCls"><option value="">Todas</option><option>A</option><option>B</option><option>C</option></select></div></div>
+ <div class="field"><label>Classe</label><select id="abcCls"><option value="">Todas</option><option>A</option><option>B</option><option>C</option></select></div><div class="field colwrap" style="position:relative"><label>&nbsp;</label><button id="abcColBtn">Colunas ▾</button><div class="colpanel" id="abcColPanel"></div></div></div>
  <div id="abcSum" style="margin-top:12px"></div><p class="note" id="abcNote"></p>
  <div class="tablewrap"><table><thead id="abcHead"></thead><tbody id="abcBody"></tbody></table></div><div id="abcMore" style="margin-top:10px"></div></details>
 <details class="card" id="planbox"><summary style="cursor:pointer;font-weight:700;font-size:16px">🎯 Plano de Ação de Preços</summary>
  <div class="controls" style="margin-top:14px">
   <div class="field"><label>Margem alvo (%) <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Margem do sistema (lucro depois do custo de compra, do ICMS de saída e do custo operacional) que cada item deve atingir. Preço de equilíbrio = Ct Compra ÷ (1 − custos de venda do item). Preço p/ meta = Ct Compra ÷ (1 − custos de venda − margem alvo). Os custos de venda do item são (CMV − Ct Compra) ÷ Valor. O ganho considera a mesma quantidade vendida.">i</span></label><input id="planM" type="number" value="5" step=".5"></div>
   <div class="field"><label>Faixa de aumento</label><select id="planF"><option value="">Todas</option><option value="a">Até 5%</option><option value="b">De 5% a 10%</option><option value="c">Acima de 10%</option><option value="s">Verificar cadastro</option></select></div>
-  <div class="field"><label>Curva (faturamento)</label><select id="planC"><option value="">Todas</option><option>A</option><option>B</option><option>C</option></select></div>
+  <div class="field"><label>Curva (faturamento)</label><select id="planC"><option value="">Todas</option><option>A</option><option>B</option><option>C</option></select></div><div class="field colwrap" style="position:relative"><label>&nbsp;</label><button id="planColBtn">Colunas ▾</button><div class="colpanel" id="planColPanel"></div></div>
  </div>
  <p class="note" id="planNote"></p><div class="kpis" id="planKpis" style="margin-top:12px"></div>
  <div class="tablewrap"><table><thead id="planHead"></thead><tbody id="planBody"></tbody></table></div><div id="planMore" style="margin-top:10px"></div></details>
@@ -258,6 +258,7 @@ function render(keep){if(keep!==true)lim=200;
  }
  let ci=0;head=head.replace(/<th/g,()=>`<th data-c="${ci++}"`);
  $('thead').innerHTML=head;$('tbody').innerHTML=body;
+ hideApply('main');
  if(hs){const th=$('thead').querySelector(`[data-c="${hs.c}"]`);if(th)th.textContent+=hs.dir>0?' ▲':' ▼'}
  $('more').innerHTML=view.length>lim?`<button data-more="300">Mostrar mais 300</button><button data-more="all">Mostrar todos (${view.length})</button>`:'';
  $('explain').textContent=(mode()===2&&$('dayf').value?`📅 Dia ${fmtD($('dayf').value)} (todos os números abaixo consideram só este dia). `:'')+`${DIAGS[current].q} Mostrando ${Math.min(lim,view.length)} de ${view.length} itens. Mediana de quantidade: ${num(med.qty)} | Mediana de faturamento: ${money(med.rev)}.`+(vm==='cmp'?' Var % = evolução de A para B; "novo" = sem base em A.':vm==='mat'?` Tendência compara o primeiro (${pdays[0]?dm(pdays[0]):''}) e o último dia (${pdays.length?dm(pdays[pdays.length-1]):''}) do Período A.`:'');
@@ -504,7 +505,7 @@ const GCOLS=[{h:'Nome',l:1,v:g=>g.n,f:g=>`<a href="#" data-g="${encodeURICompone
 function renderGrp(){
  if(!$('grpbox').open||!rows.length)return;const q=nz($('grpQ').value);
  const d=grpData($('grpBy').value).filter(g=>!q||nz(g.n).includes(q));
- if(!SORTST.grp)SORTST.grp={c:4,d:-1};tbl('grp',GCOLS,d,2000);
+ if(!SORTST.grp)SORTST.grp={c:4,d:-1};tbl('grp',GCOLS,d,2000);hideApply('grp');
 }
 const ABCCOLS=base=>[{h:'Classe',v:r=>r['abc_'+base],f:r=>`<b>${r['abc_'+base]}</b>`},{h:'Código',l:1,v:r=>String(r.code)},{h:'Descrição',l:1,v:r=>r.desc,f:r=>esc(r.desc)+(r.offer?'<span class="badge">Em Oferta</span>':'')},{h:'Grupo',l:1,v:r=>r.grp||'',f:r=>esc(r.grp||'')},{h:'Fornecedor',l:1,v:r=>r.sup||'',f:r=>esc(r.sup||'')},{h:'Qtde',v:r=>r.qty,f:r=>num(r.qty)},{h:'Faturamento',v:r=>r.rev,f:r=>money(r.rev)},{h:'Lucro',v:r=>r.profit,f:r=>money(r.profit),k:r=>r.profit<0?'bad':''},{h:'Margem',v:r=>r.margin,f:r=>pct(r.margin)},{h:'% acumulado',v:r=>r['cum_'+base],f:r=>pct(r['cum_'+base])}];
 function renderAbc(keep){
@@ -513,7 +514,7 @@ function renderAbc(keep){
  const sum=['A','B','C'].map(c=>{const l=rows.filter(r=>r['abc_'+base]===c),rev=l.reduce((a,r)=>a+r.rev,0),pr=l.reduce((a,r)=>a+r.profit,0),qq=l.reduce((a,r)=>a+r.qty,0);return`<tr><td class="l"><b>${c}</b></td><td>${num(l.length)} (${pct(rows.length?l.length/rows.length*100:0)})</td><td>${money(rev)} (${pct(tR?rev/tR*100:0)})</td><td>${num(qq)} (${pct(tQ?qq/tQ*100:0)})</td><td class="${pr<0?'bad':''}">${money(pr)}</td><td>${pct(rev?pr/rev*100:0)}</td><td>${num(l.filter(r=>r.profit<0).length)}</td></tr>`}).join('');
  $('abcSum').innerHTML='<table class="cmp"><thead><tr><th class="l">Classe</th><th>Itens (% dos itens)</th><th>Faturamento (% do total)</th><th>Qtde (% do total)</th><th>Lucro</th><th>Margem</th><th>Itens em prejuízo</th></tr></thead><tbody>'+sum+'</tbody></table>';
  const d=rows.filter(r=>!cl||r['abc_'+base]===cl).sort((a,b)=>b[base]-a[base]);if(!SORTST.abc)SORTST.abc={c:-1,d:1};
- const n=tbl('abc',ABCCOLS(base),d,abcLim);
+ const n=tbl('abc',ABCCOLS(base),d,abcLim);hideApply('abc');
  $('abcNote').textContent=`Mostrando ${Math.min(abcLim,n)} de ${n} itens, ordenados pela base da curva. Clique nos títulos para reordenar.`;
  $('abcMore').innerHTML=n>abcLim?`<button data-more="1">Mostrar mais 500</button> <button data-more="all">Mostrar todos (${n})</button>`:'';
 }
@@ -566,9 +567,32 @@ function renderPlan(keep){
  $('planNote').textContent=`Itens abaixo da margem alvo, calculados com o Ct Compra e os custos de venda do próprio item (ICMS de saída e custo operacional, proporcionais ao preço), independentemente do campo "Custo usado". Ganho a quantidades constantes; os totais de ganho não incluem os itens de "Verificar cadastro" (provável erro de unidade ou de cadastro), que ficam no fim da lista.`+(D.semCt?` ${D.semCt} itens sem Ct Compra no arquivo foram ignorados (históricos salvos antes dessa coluna precisam ser salvos de novo).`:'');
  $('planKpis').innerHTML=[['Itens no plano',num(all.length)],['Até 5% | 5–10% | acima de 10%',`${n('a')} | ${n('b')} | ${n('c')}`],['Verificar cadastro',num(n('s'))],['Ganho p/ empate (R$)',money(gB)],['Ganho p/ meta (R$)',money(gT)],['Margem sistema: hoje → com a meta',pct(D.tR?D.tP/D.tR*100:0)+' → '+pct(D.tR?(D.tP+gT)/D.tR*100:0)]].map(a=>`<div class="kpi"><small>${a[0]}</small><b style="font-size:17px">${a[1]}</b></div>`).join('');
  if(!SORTST.plan)SORTST.plan={c:12,d:-1};
- const tot=tbl('plan',PCOLS,L,planLim);
+ const tot=tbl('plan',PCOLS,L,planLim);hideApply('plan');
  $('planMore').innerHTML=tot>planLim?`<button data-more="1">Mostrar mais 300</button> <button data-more="all">Mostrar todos (${tot})</button>`:'';
 }
+
+let hid={};try{hid=JSON.parse(localStorage.getItem('dgHid')||'{}')}catch(e){}
+const saveHid=()=>{try{localStorage.setItem('dgHid',JSON.stringify(hid))}catch(e){}};
+const CT={main:{k:()=>'main_'+(mode()===2?$('vmode').value:'std'),h:'thead',b:'tbody'},grp:{k:()=>'grp_'+$('grpBy').value,h:'grpHead',b:'grpBody'},abc:{k:()=>'abc',h:'abcHead',b:'abcBody'},plan:{k:()=>'plan',h:'planHead',b:'planBody'}};
+const thLabels=id=>[...$(CT[id].h).querySelectorAll('th')].map(t=>t.textContent.replace(/ [▲▼]$/,''));
+function hideApply(id){
+ const c=CT[id],h=hid[c.k()]||[];let css='';
+ thLabels(id).forEach((l,i)=>{if(h.includes(l))css+=`#${c.h} th:nth-child(${i+1}),#${c.b} td:not([colspan]):nth-child(${i+1}){display:none}`});
+ let st=document.getElementById('hc_'+id);if(!st){st=document.createElement('style');st.id='hc_'+id;document.head.appendChild(st)}st.textContent=css;
+ $(id+'ColBtn').textContent=h.length?`Colunas (${h.length} ocultas) ▾`:'Colunas ▾';
+}
+function colPanel(id){
+ const c=CT[id],k=c.k(),h=hid[k]||[],p=$(id+'ColPanel');
+ p.innerHTML='<button data-all="1">Mostrar todas</button>'+thLabels(id).map(l=>`<label><input type="checkbox" data-l="${encodeURIComponent(l)}" ${h.includes(l)?'':'checked'}> ${esc(l)}</label>`).join('');
+}
+Object.keys(CT).forEach(id=>{
+ const btn=$(id+'ColBtn'),p=$(id+'ColPanel');
+ btn.addEventListener('click',e=>{e.stopPropagation();const open=p.style.display==='block';document.querySelectorAll('.colpanel').forEach(x=>x.style.display='none');if(!open){colPanel(id);p.style.display='block'}});
+ p.addEventListener('click',e=>{e.stopPropagation();const k=CT[id].k();
+  if(e.target.dataset.all){hid[k]=[];saveHid();hideApply(id);colPanel(id);return}
+  const cb=e.target.closest('input[data-l]');if(!cb)return;const l=decodeURIComponent(cb.dataset.l),a=(hid[k]||[]).filter(x=>x!==l);if(!cb.checked)a.push(l);hid[k]=a;saveHid();hideApply(id)});
+});
+document.addEventListener('click',()=>document.querySelectorAll('.colpanel').forEach(x=>x.style.display='none'));
 let st;$('search').addEventListener('input',()=>{clearTimeout(st);st=setTimeout(render,250)});
 $('thead').addEventListener('click',e=>{const th=e.target.closest('th[data-c]');if(!th)return;const c=+th.dataset.c,vm=mode()===2?$('vmode').value:'std';if(hsort&&hsort.vm===vm&&hsort.c===c){if(hsort.dir===1)hsort.dir=-1;else hsort=null}else hsort={vm,c,dir:1};render()});
 $('sort').addEventListener('change',()=>{hsort=null;render()});
