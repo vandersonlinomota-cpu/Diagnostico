@@ -31,7 +31,7 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
 </style>
 </head>
 <body>
-<header><h1>Diagnóstico de Itens</h1><p>Cada item aparece em uma única análise, seguindo a hierarquia: Prejuízo → Margem → Preço/Giro → Baixo giro → Oportunidade.</p><p style="margin-top:6px;font-size:11px;color:#94a3b8">Versão de 28/10/2026 · com ocultar colunas</p></header>
+<header><h1>Diagnóstico de Itens</h1><p>Cada item aparece em uma única análise, seguindo a hierarquia: Prejuízo → Margem → Preço/Giro → Baixo giro → Oportunidade.</p><p style="margin-top:6px;font-size:11px;color:#94a3b8">Versão de 28/10/2026 · queda de giro com parâmetros</p></header>
 <main>
 <div class="card">
   <div class="controls">
@@ -74,7 +74,7 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
    <div class="field"><label>Mostrar</label><select id="topn"><option value="0">Todos</option><option value="10">Top 10</option><option value="20">Top 20</option><option value="50">Top 50</option></select></div>
    <div class="field" id="dfield" style="display:none"><label>Dia <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Escolha um dia para ver só as movimentações dele: KPIs, diagnósticos, medianas e a tabela são recalculados para esse dia. Também dá para clicar em uma barra do gráfico de evolução diária. Em Todo o período, tudo é acumulado (Período A).">i</span></label><select id="dayf"></select></div><div class="field" id="vfield" style="display:none"><label>Visão da tabela</label><select id="vmode"><option value="std">Diagnóstico (padrão)</option><option value="mat">Matriz por dia</option><option value="cmp">Comparar blocos A vs B</option></select></div><div class="field colwrap" style="position:relative"><label>&nbsp;</label><button id="mainColBtn">Colunas ▾</button><div class="colpanel" id="mainColPanel"></div></div><button class="primary" id="xlsBtn">Baixar Excel organizado</button><button id="csvBtn">CSV da aba atual</button>
  </div>
- <div class="tabs" id="qf" style="display:none;margin:12px 0 0"><button class="tab" data-qf="drop">📉 Queda de giro</button><button class="tab" data-qf="off">🏷️ Apenas em oferta</button><button class="tab" data-qf="out">🚫 Ruptura / sem venda</button></div>
+ <div class="tabs" id="qf" style="display:none;margin:12px 0 0"><button class="tab" data-qf="drop">📉 Queda de giro</button><button class="tab" data-qf="off">🏷️ Apenas em oferta</button><button class="tab" data-qf="out">🚫 Ruptura / sem venda</button><span class="field" style="flex-direction:row;align-items:center;gap:6px;margin-left:12px;font-size:12px"><label>Queda de giro: critério <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Queda de giro compara a venda do começo e do fim do período. Média: média diária da 2ª metade dos dias contra a 1ª metade. Nunca subiu: a venda não aumentou de um dia para o outro e o último dia ficou abaixo do primeiro. Queda mínima: quanto a venda precisa cair. Venda inicial mínima: ignora itens que já vendiam pouco no começo (ruído). Dia sem linha no arquivo conta como zero.">i</span></label><select id="qfMode"><option value="media">média da 2ª metade vs 1ª</option><option value="dia">nunca subiu, dia a dia</option></select><label>queda mín. (%)</label><input id="qfDrop" type="number" value="20" step="5" style="width:70px"><label>venda inicial mín.</label><input id="qfMin" type="number" value="3" step="1" style="width:70px"></span></div>
  <p class="note" id="explain"></p>
  <div class="tablewrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
  <div id="more" style="margin-top:10px;display:flex;gap:8px"></div>
@@ -210,11 +210,14 @@ function renderTabs(){
 const SORTS={poff:(a,b)=>(a.offer?a.profitOff:1e15)-(b.offer?b.profitOff:1e15),pot:(a,b)=>b.pot-a.pot,qty:(a,b)=>b.qty-a.qty,rev:(a,b)=>b.rev-a.rev,margin:(a,b)=>a.margin-b.margin,profit:(a,b)=>a.profit-b.profit,customers:(a,b)=>b.customers-a.customers};
 const AUTO={0:SORTS.pot,1:SORTS.profit,2:SORTS.pot,3:SORTS.qty,4:(a,b)=>a.qty-b.qty,5:SORTS.pot,6:SORTS.poff};
 const STD_HEAD=`<tr>
-  <th class="l">Código</th><th class="l">Descrição</th><th class="l">Grupo</th><th class="l">Fornecedor</th><th>Curva</th><th>Qtde</th><th>Faturamento</th><th>Lucro</th><th>Margem</th><th>Margem sistema</th><th>Clientes</th><th>Lucro oferta</th><th>Preço atual</th><th>Preço p/ margem alvo</th><th>Potencial R$</th><th class="l">Por que está aqui?</th><th class="l">Ação</th>
+  <th class="l">Código</th><th class="l">Descrição</th><th class="l">Grupo</th><th class="l">Fornecedor</th><th>Curva</th><th>Qtde</th><th>Giro por dia</th><th>Var. giro</th><th>Faturamento</th><th>Lucro</th><th>Margem</th><th>Margem sistema</th><th>Clientes</th><th>Lucro oferta</th><th>Preço atual</th><th>Preço p/ margem alvo</th><th>Potencial R$</th><th class="l">Por que está aqui?</th><th class="l">Ação</th>
  </tr>`;
 const dm=d=>d.slice(8)+'/'+d.slice(5,7), inR=(d,f,t)=>(!f||d>=f)&&(!t||d<=t), alldays=()=>[...new Set(files.map(f=>f.date))].sort();
 const qs=r=>pdays.map(d=>(r.d[d]||{}).qty||0);
-const QF={drop:r=>{const q=qs(r);return q.length>1&&q[q.length-1]<q[0]&&q.every((v,i)=>!i||v<=q[i-1])},
+const qfp=()=>({mode:$('qfMode').value,drop:Math.max(0,P('qfDrop')/100),min:P('qfMin')});
+const QF={drop:r=>{const q=qs(r),n=q.length;if(n<2)return false;const p=qfp();
+  if(p.mode==='dia')return q[0]>0&&q[0]>=p.min&&q.every((v,i)=>!i||v<=q[i-1])&&1-q[n-1]/q[0]>=p.drop&&q[n-1]<q[0];
+  const h=Math.floor(n/2),a=q.slice(0,h).reduce((x,y)=>x+y,0)/h,b=q.slice(n-h).reduce((x,y)=>x+y,0)/h;return a>0&&a>=p.min&&b<a&&1-b/a>=p.drop},
  off:r=>{const x=pdays.filter(d=>(r.d[d]||{}).qty>0);return x.length>0&&x.every(d=>r.d[d].cmvOff>0)},
  out:r=>{const q=qs(r),n=q.length;return n>1&&q[n-1]<=0&&q.slice(0,n-1).some(v=>v>0)}};
 const blk=(r,f,t,k)=>Object.keys(r.d).filter(d=>inR(d,f,t)).reduce((a,d)=>a+r.d[d][k],0);
@@ -227,8 +230,17 @@ function ACC(vm,O){
  const base=[r=>String(r.code),r=>r.desc];
  if(vm==='mat')return[...base,...pdays.flatMap(d=>[r=>qOf(r,d),r=>rOf(r,d)]),r=>qs(r).reduce((a,b)=>a+b,0),r=>pdays.reduce((a,d)=>a+rOf(r,d),0),trend];
  if(vm==='cmp')return[...base,r=>r.cm.qa,r=>r.cm.qb,r=>{const v=vp(r.cm.qa,r.cm.qb);return v==null?Infinity:v},r=>r.cm.la,r=>r.cm.lb,r=>{const v=vp(r.cm.la,r.cm.lb);return v==null?Infinity:v}];
- return[...base,r=>r.grp||'',r=>r.sup||'',r=>r.abc||'',r=>r.qty,r=>r.rev,r=>r.profit,r=>r.margin,r=>r.marginErp||0,r=>r.customers,r=>r.offer?r.profitOff:undefined,r=>r.price,r=>r.targetPrice,r=>r.pot,r=>O?r.offWhy:r.why,r=>O?r.offAct:r.act];
+ return[...base,r=>r.grp||'',r=>r.sup||'',r=>r.abc||'',r=>r.qty,r=>{const q=qs(r);return q.length?q[q.length-1]:0},r=>trend(r),r=>r.rev,r=>r.profit,r=>r.margin,r=>r.marginErp||0,r=>r.customers,r=>r.offer?r.profitOff:undefined,r=>r.price,r=>r.targetPrice,r=>r.pot,r=>O?r.offWhy:r.why,r=>O?r.offAct:r.act];
 }
+function spark(r){
+ const q=qs(r),n=q.length;if(n<2)return'—';const mx=Math.max(...q,1),w=Math.min(n,30);
+ const txt=(n>8?[...q.slice(0,4).map(num),'…',...q.slice(-3).map(num)]:q.map(num)).join(' → ');
+ const bars=q.slice(-30).map((v,i)=>`<rect x="${i*4}" y="${18-Math.max(v>0?1:0,v/mx*18)}" width="3" height="${Math.max(v>0?1:0,v/mx*18)}" fill="#667085"/>`).join('');
+ return`<span title="${pdays.map((d,i)=>dm(d)+': '+num(q[i])).join('&#10;')}"><svg width="${w*4}" height="18" style="vertical-align:middle;margin-right:6px">${bars}</svg>${txt}</span>`}
+function varGiro(r){const q=qs(r),n=q.length;if(n<2)return'—';const a=q[0],b=q[n-1];if(!a&&!b)return'—';if(!a)return'<span class="good">novo</span>';const v=(b/a-1)*100;return`<span class="${v<0?'bad':v>0?'good':''}">${v>0?'+':''}${pct(v)}</span>`}
+function qfNote(){if(!qf)return'';const p=qfp();
+ return qf==='drop'?` 📉 Queda de giro: ${p.mode==='media'?'média diária da 2ª metade dos dias pelo menos '+pct(p.drop*100)+' abaixo da média da 1ª metade':'a venda nunca subiu de um dia para o outro e o último dia ficou pelo menos '+pct(p.drop*100)+' abaixo do primeiro'}, com venda inicial ≥ ${num(p.min)}. Dia sem linha no arquivo conta como zero. Veja a coluna "Giro por dia" (passe o mouse para ver cada dia).`
+ :qf==='off'?' 🏷️ Apenas em oferta: só vendeu nos dias em que o CMV Oferta era maior que zero.':' 🚫 Ruptura: vendeu em dias anteriores e zerou no último dia do período.'}
 function render(keep){if(keep!==true)lim=200;
  const q=$('search').value.toLowerCase(),s=$('sort').value,n=+$('topn').value,vm=mode()===2?$('vmode').value:'std',O=current===6,crit=P('criticalMargin');
  const match=r=>(!q||String(r.code).toLowerCase().includes(q)||r.desc.toLowerCase().includes(q)||(r.grp||'').toLowerCase().includes(q)||(r.sup||'').toLowerCase().includes(q))&&(!qf||QF[qf](r));
@@ -254,14 +266,14 @@ function render(keep){if(keep!==true)lim=200;
    return `<tr>${desc(r)}<td>${num(c.qa)}</td><td>${num(c.qb)}</td><td>${vf(vp(c.qa,c.qb))}</td><td class="${c.la<0?'bad':''}">${money(c.la)}</td><td class="${c.lb<0?'bad':''}">${money(c.lb)}</td><td>${vf(vp(c.la,c.lb))}</td></tr>`}).join('');
  }else{
   head=STD_HEAD;
-  body=vis.map(r=>`<tr>${desc(r)}<td class="l">${esc(r.grp||'')}</td><td class="l">${esc(r.sup||'')}</td><td>${r.abc||''}</td><td>${num(r.qty)}</td><td>${money(r.rev)}</td><td class="${r.profit<0?'bad':''}">${money(r.profit)}</td><td class="${r.margin<0?'bad':r.margin<crit?'warn':'good'}">${pct(r.margin)}</td><td class="${r.marginErp<0?'bad':''}">${pct(r.marginErp)}</td><td>${num(r.customers)}</td><td class="${r.offer&&r.profitOff<0?'bad':''}">${r.offer?money(r.profitOff):'—'}</td><td>${money(r.price)}</td><td>${isFinite(r.targetPrice)?money(r.targetPrice):'—'}</td><td>${money(r.pot)}</td><td class="l">${O?'🏷️ '+esc(r.offWhy):DIAGS[r.diag].n.split(' ')[0]+' '+esc(r.why)}</td><td class="l ${O?r.offCls:r.cls}">${O?r.offAct:r.act}</td></tr>`).join('');
+  body=vis.map(r=>`<tr>${desc(r)}<td class="l">${esc(r.grp||'')}</td><td class="l">${esc(r.sup||'')}</td><td>${r.abc||''}</td><td>${num(r.qty)}</td><td class="l">${spark(r)}</td><td>${varGiro(r)}</td><td>${money(r.rev)}</td><td class="${r.profit<0?'bad':''}">${money(r.profit)}</td><td class="${r.margin<0?'bad':r.margin<crit?'warn':'good'}">${pct(r.margin)}</td><td class="${r.marginErp<0?'bad':''}">${pct(r.marginErp)}</td><td>${num(r.customers)}</td><td class="${r.offer&&r.profitOff<0?'bad':''}">${r.offer?money(r.profitOff):'—'}</td><td>${money(r.price)}</td><td>${isFinite(r.targetPrice)?money(r.targetPrice):'—'}</td><td>${money(r.pot)}</td><td class="l">${O?'🏷️ '+esc(r.offWhy):DIAGS[r.diag].n.split(' ')[0]+' '+esc(r.why)}</td><td class="l ${O?r.offCls:r.cls}">${O?r.offAct:r.act}</td></tr>`).join('');
  }
  let ci=0;head=head.replace(/<th/g,()=>`<th data-c="${ci++}"`);
  $('thead').innerHTML=head;$('tbody').innerHTML=body;
  hideApply('main');
  if(hs){const th=$('thead').querySelector(`[data-c="${hs.c}"]`);if(th)th.textContent+=hs.dir>0?' ▲':' ▼'}
  $('more').innerHTML=view.length>lim?`<button data-more="300">Mostrar mais 300</button><button data-more="all">Mostrar todos (${view.length})</button>`:'';
- $('explain').textContent=(mode()===2&&$('dayf').value?`📅 Dia ${fmtD($('dayf').value)} (todos os números abaixo consideram só este dia). `:'')+`${DIAGS[current].q} Mostrando ${Math.min(lim,view.length)} de ${view.length} itens. Mediana de quantidade: ${num(med.qty)} | Mediana de faturamento: ${money(med.rev)}.`+(vm==='cmp'?' Var % = evolução de A para B; "novo" = sem base em A.':vm==='mat'?` Tendência compara o primeiro (${pdays[0]?dm(pdays[0]):''}) e o último dia (${pdays.length?dm(pdays[pdays.length-1]):''}) do Período A.`:'');
+ $('explain').textContent=(mode()===2&&$('dayf').value?`📅 Dia ${fmtD($('dayf').value)} (todos os números abaixo consideram só este dia). `:'')+`${DIAGS[current].q} Mostrando ${Math.min(lim,view.length)} de ${view.length} itens. Mediana de quantidade: ${num(med.qty)} | Mediana de faturamento: ${money(med.rev)}.`+(vm==='cmp'?' Var % = evolução de A para B; "novo" = sem base em A.':vm==='mat'?` Tendência compara o primeiro (${pdays[0]?dm(pdays[0]):''}) e o último dia (${pdays.length?dm(pdays[pdays.length-1]):''}) do Período A.`:'')+qfNote();
 }
 const fk=v=>Math.abs(v)>=1e6?num(v/1e6)+' mi':Math.abs(v)>=1e3?num(v/1e3)+' mil':num(v);
 function bars(title,vals,labels,color,days){const sel=$('dayf').value;
@@ -370,6 +382,7 @@ $('splitBtn').addEventListener('click',()=>{const d=alldays();if(d.length<2){ale
 $('vmode').addEventListener('change',render);
 $('dayf').addEventListener('change',runAnalysis);
 $('chartCard').addEventListener('click',e=>{const r=e.target.closest('[data-day]');if(!r)return;const d=r.dataset.day;$('dayf').value=$('dayf').value===d?'':d;runAnalysis()});
+['qfMode','qfDrop','qfMin'].forEach(id=>$(id).addEventListener('change',render));
 document.querySelectorAll('[data-qf]').forEach(b=>b.addEventListener('click',()=>{qf=qf===b.dataset.qf?'':b.dataset.qf;document.querySelectorAll('[data-qf]').forEach(x=>x.classList.toggle('active',x.dataset.qf===qf));render()}));
 $('more').addEventListener('click',e=>{const b=e.target.closest('[data-more]');if(!b)return;lim=b.dataset.more==='all'?1e9:lim+300;render(true)});
 
