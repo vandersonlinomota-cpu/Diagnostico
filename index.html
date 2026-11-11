@@ -31,7 +31,7 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
 </style>
 </head>
 <body>
-<header><h1>Diagnóstico de Itens</h1><p>Cada item aparece em uma única análise, seguindo a hierarquia: Prejuízo → Margem → Preço/Giro → Baixo giro → Oportunidade.</p><p style="margin-top:6px;font-size:11px;color:#94a3b8">Versão de 07/11/2026 · estoque e cobertura</p></header>
+<header><h1>Diagnóstico de Itens</h1><p>Cada item aparece em uma única análise, seguindo a hierarquia: Prejuízo → Margem → Preço/Giro → Baixo giro → Oportunidade.</p><p style="margin-top:6px;font-size:11px;color:#94a3b8">Versão de 10/11/2026 · resultado de reajuste e campanha</p></header>
 <main>
 <div class="card">
   <div class="controls">
@@ -67,6 +67,19 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
 <p class="note">Os diagnósticos usam o Período A (por padrão, todos os dias carregados). O Período B é opcional e serve para comparar blocos de dias: as variações mostram a evolução de A para B (ex.: A = semana anterior, B = semana atual). Datas vêm do nome do arquivo (ex.: 2026-10-06 ou 06-10-2026); ajuste acima se estiverem erradas.</p><div id="cmp"></div></div>
 <div class="card" id="baseFilters" style="display:none"><div class="controls"><div class="field"><label>Departamento</label><select id="fDepto"></select></div><div class="field"><label>DPTO (grupo do sistema)</label><select id="fDpto"></select></div><div class="field"><label>Comprador</label><select id="fComp"></select></div><span class="note" id="fNote"></span></div></div>
 <div class="kpis" id="kpis"></div>
+<details class="card" id="sumbox"><summary style="cursor:pointer;font-weight:700;font-size:16px">📝 Resumo para o gestor</summary>
+ <div class="controls" style="margin-top:14px">
+  <div class="field"><label>Nome da loja</label><input id="sumLoja" value="Cavaleiro" style="width:140px"></div>
+  <div class="field"><label>Itens por grupo <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Quantos itens com prejuízo listar em cada grupo (DPTO). Os grupos aparecem do maior para o menor prejuízo.">i</span></label><input id="sumN" type="number" value="3" min="1" style="width:80px"></div>
+  <div class="field"><label>Prejuízo mínimo (R$) <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Só entram no resumo itens que perderam pelo menos esse valor no período.">i</span></label><input id="sumMin" type="number" value="20" style="width:90px"></div>
+  <label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--text);font-weight:400"><input type="checkbox" id="sumOf" checked> ofertas</label>
+  <label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--text);font-weight:400"><input type="checkbox" id="sumEst" checked> estoque</label>
+  <label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--text);font-weight:400"><input type="checkbox" id="sumComp" checked> comprador</label>
+  <button class="primary" id="sumGen">Gerar resumo</button><button id="sumCopy">Copiar texto</button>
+ </div>
+ <div class="field" style="margin-top:12px"><label>Observações: o que só você sabe (televendas, vencimento, quem mexeu no preço...) <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="O sistema não sabe o canal da venda (ex.: televendas), data de validade, nem quem alterou o preço. Escreva aqui e isso vai no fim do resumo. Você também pode editar o texto gerado antes de copiar.">i</span></label><textarea id="sumObs" rows="3" style="width:100%;padding:8px;border:1px solid #d0d5dd;border-radius:8px;font:13px Arial"></textarea></div>
+ <p class="note" id="sumMsg">Clique em "Gerar resumo". O texto abaixo é editável. Ao mudar filtros ou o dia, gere de novo.</p>
+ <textarea id="sumTxt" rows="16" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;font:13px/1.5 Arial"></textarea></details>
 <div class="card" id="chartCard" style="display:none"></div>
 <div class="card">
  <div class="tabs" id="tabs"></div>
@@ -102,6 +115,36 @@ th[data-c]{cursor:pointer;user-select:none}th[data-c]:hover{background:#eef2f6}t
  </div>
  <p class="note" id="planNote"></p><div class="kpis" id="planKpis" style="margin-top:12px"></div>
  <div class="tablewrap"><table><thead id="planHead"></thead><tbody id="planBody"></tbody></table></div><div id="planMore" style="margin-top:10px"></div></details>
+<details class="card" id="rzbox"><summary style="cursor:pointer;font-weight:700;font-size:16px">📈 Resultado de reajuste e de campanha</summary>
+ <p class="note" style="margin-top:12px">Precisa de vários dias carregados (Modo 2 ou histórico). Lucro e margem seguem o campo "Custo usado". Use janelas de 7 dias para equilibrar os dias da semana.</p>
+ <div class="controls"><div class="field"><label>O que analisar</label><select id="rzType"><option value="a">Reajuste de preços (antes × depois)</option><option value="b">Dia de oferta (vs dias normais)</option></select></div></div>
+
+ <div id="rzA">
+  <div class="controls" style="margin-top:12px">
+   <div class="field"><label>Lote salvo</label><select id="rzLote"></select></div>
+   <div class="field"><label>Nome do lote</label><input id="rzName" placeholder="ex.: Reajuste mercearia sem. 46" style="width:230px"></div>
+   <div class="field"><label>Itens do plano <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Preenche a lista de códigos com os itens do Plano de Ação de Preços (os de maior ganho para a meta, sem os marcados como Verificar cadastro). O preço sugerido vai junto, depois do ponto e vírgula.">i</span></label><input id="rzN" type="number" value="30" min="1" style="width:80px"></div>
+   <button id="rzFromPlan">Preencher com o plano atual</button><button id="rzSave">Salvar lote</button><button id="rzDel">Excluir lote</button>
+  </div>
+  <div class="field" style="margin-top:10px"><label>Códigos do lote <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Um item por linha: código, ou código;preço novo. É o que você reajustou. O sistema compara a venda antes e depois da data de início.">i</span></label><textarea id="rzCodes" rows="4" style="width:100%;padding:8px;border:1px solid #d0d5dd;border-radius:8px;font:13px Arial"></textarea></div>
+  <div class="controls" style="margin-top:10px">
+   <div class="field"><label>Início do novo preço</label><select id="rzStart"></select></div>
+   <div class="field"><label>Janela (dias) <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Quantos dias depois do início entram na análise. Os mesmos dias imediatamente antes do início servem de comparação. 7 dias equilibra os dias da semana.">i</span></label><input id="rzWin" type="number" value="7" min="1" style="width:80px"></div>
+  </div>
+ </div>
+
+ <div id="rzB" style="display:none">
+  <div class="controls" style="margin-top:12px">
+   <div class="field"><label>Dia da oferta</label><select id="rzDay"></select></div>
+   <div class="field"><label>Comparar com</label><select id="rzBase"><option value="wd">Mesmo dia da semana (semanas anteriores)</option><option value="prev">Dias anteriores</option></select></div>
+   <div class="field"><label>Quantos dias da base</label><input id="rzNB" type="number" value="4" min="1" style="width:80px"></div>
+  </div>
+ </div>
+ <div class="controls" style="margin-top:12px"><button class="primary" id="rzRun">Analisar resultado</button><button id="rzCopy">Copiar texto</button></div>
+ <p class="note" id="rzNote"></p><div id="rzSum"></div>
+ <div class="tablewrap" style="margin-top:12px"><table><thead id="rzHead"></thead><tbody id="rzBody"></tbody></table></div>
+ <textarea id="rzTxt" rows="9" style="width:100%;margin-top:12px;padding:10px;border:1px solid #d0d5dd;border-radius:8px;font:13px/1.5 Arial"></textarea>
+</details>
 <details class="card" id="mixbox"><summary style="cursor:pointer;font-weight:700;font-size:16px">🎯 Sugestão Inteligente de Mix de Ofertas</summary>
  <div class="controls" style="margin-top:14px">
   <div class="field"><label>Itens no encarte <span class="tip" tabindex="0" role="button" aria-label="Ajuda" data-tip="Tamanho do encarte. A divisão é fixa: 20% itens âncora (alto giro, margem de oferta de 2% a 5%), 50% giro médio (margem atual de 8% a 12%, desconto leve de 4%) e 30% margem alta (acima de 15%, desconto de 2%).">i</span></label><input id="mixN" type="number" value="20" min="5" step="1"></div>
@@ -353,7 +396,7 @@ function renderChart(){
  c.style.display='block';
  c.innerHTML=`<h3 style="margin-top:0">Evolução diária (${ds.length} dia(s) carregados)</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">`+bars('Faturamento (R$)',m.map(x=>x.rev),lb,'#2563eb',ds)+bars('Lucro total (R$)',m.map(x=>x.pr),lb,'#067647',ds)+bars('Perda em ofertas (R$)',m.map(x=>x.lo),lb,'#b42318',ds)+'</div><p class="note" style="margin-bottom:0">Clique em uma barra para filtrar a tabela por aquele dia; clique de novo para voltar ao acumulado.</p>';
 }
-function buildDaily(){daily=new Map();files.forEach(f=>f.rows.forEach(x=>{const k=x.code+'|'+x.desc;let o=daily.get(k);if(!o){o={};daily.set(k,o)}const d=o[f.date]||(o[f.date]={qty:0,rev:0,profit:0,cmvOff:0,profitOff:0});d.qty+=x.qty;d.rev+=x.rev;d.profit+=x.profit;d.cmvOff+=x.cmvOff;d.profitOff+=x.profitOff}))}
+function buildDaily(){daily=new Map();files.forEach(f=>f.rows.forEach(x=>{const k=x.code+'|'+x.desc;let o=daily.get(k);if(!o){o={};daily.set(k,o)}const d=o[f.date]||(o[f.date]={qty:0,rev:0,profit:0,cmvOff:0,profitOff:0,cust:0});d.cust+=x.customers||0;d.qty+=x.qty;d.rev+=x.rev;d.profit+=x.profit;d.cmvOff+=x.cmvOff;d.profitOff+=x.profitOff}))}
 const tb=$('tipbox');let pinned=null;
 function showTip(el){tb.textContent=el.dataset.tip;tb.style.display='block';const r=el.getBoundingClientRect(),w=tb.offsetWidth,h=tb.offsetHeight;tb.style.left=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8)+'px';let y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);tb.style.top=y+'px'}
 function hideTip(){tb.style.display='none';pinned=null}
@@ -389,11 +432,11 @@ function parseFile(f){return new Promise((ok,no)=>{const rd=new FileReader();rd.
  const rs=data.map(x=>{const rev=g(x,k.rev),cmvR=g(x,k.cmv),ce=k.ctE?g(x,k.ctE):0,cOffR=g(x,k.cmvOff),pOffR=g(x,k.profitOff);
   const erp={cmv:cmvR,profit:k.profit?g(x,k.profit):rev-cmvR,cmvOff:cOffR,profitOff:pOffR};let emp=null;
   if(k.ctE&&ce>0){emp={cmv:ce,profit:rev-ce,cmvOff:cOffR,profitOff:pOffR};if(cOffR>0){emp.cmvOff=cmvR>0?ce*cOffR/cmvR:ce;emp.profitOff=(cOffR+pOffR)-emp.cmvOff}}else if(k.ctE)fb++;
-  const row={code:k.code?x[k.code]:'',desc:k.desc?String(x[k.desc]):'',grp:k.grp?String(x[k.grp]).trim():'',sup:k.sup?String(x[k.sup]).trim():'',ean:k.ean?String(x[k.ean]).trim():'',qty:g(x,k.qty),rev,customers:g(x,k.cust),alt:{erp,emp},profitErp:erp.profit,cmvErp:erp.cmv,ctC:k.ctC?g(x,k.ctC):0};
+  const row={code:k.code?x[k.code]:'',desc:k.desc?String(x[k.desc]):'',grp:k.grp?String(x[k.grp]).trim():'',sup:k.sup?String(x[k.sup]).trim():'',ean:k.ean?String(x[k.ean]).trim():'',qty:g(x,k.qty),rev,customers:g(x,k.cust),alt:{erp,emp},profitErp:erp.profit,cmvErp:erp.cmv,profitOffErp:erp.profitOff,ctC:k.ctC?g(x,k.ctC):0};
   setCost(row,cm);return row}).filter(r=>r.qty||r.rev||r.cmv);
  ok({name:f.name,date:fileDate(f),rows:rs,offCols:[k.cmvOff,k.profitOff],costInfo:{col:k.ctE,fb}})}catch(err){no(err)}};rd.readAsArrayBuffer(f)})}
 function aggregate(from,to){
- const m=new Map(),F=['qty','rev','cmv','profit','cmvOff','profitOff','customers','profitErp','ctC','cmvErp'];
+ const m=new Map(),F=['qty','rev','cmv','profit','cmvOff','profitOff','customers','profitErp','ctC','cmvErp','profitOffErp'];
  files.filter(f=>mode()===1||((!from||f.date>=from)&&(!to||f.date<=to))).forEach(f=>f.rows.forEach(x=>{
   const key=x.code+'|'+x.desc;let a=m.get(key);if(!a){a={code:x.code,desc:x.desc,key,grp:x.grp,sup:x.sup,ean:x.ean};F.forEach(c=>a[c]=0);m.set(key,a)}F.forEach(c=>a[c]+=x[c])}));
  return [...m.values()].map(a=>(a.margin=a.rev?a.profit/a.rev*100:0,a.marginErp=a.rev?a.profitErp/a.rev*100:0,a.price=a.qty?a.rev/a.qty:0,a.costUnit=a.qty?a.cmv/a.qty:0,a));
@@ -416,7 +459,7 @@ function runAnalysis(){
  rows=aggregate(er[0],er[1]);rows.forEach(r=>r.d=daily.get(r.key)||{});rows.forEach(applyBase);fillFilters(rows);rows=rows.filter(passB);
  pdays=mode()===2?alldays().filter(d=>inR(d,er[0],er[1])):[files[0].date];
  const m2=mode()===2;$('vfield').style.display=m2?'flex':'none';$('dfield').style.display=m2?'flex':'none';$('qf').style.display=m2?'flex':'none';
- current=Math.min(current,6);build();renderCompare();renderChart();
+ current=Math.min(current,6);build();renderCompare();renderChart();rzFill();
 }
 function renderFiles(){$('flist').innerHTML=files.map((f,i)=>`<span>${esc(f.name)} <input type="date" value="${f.date}" onchange="files[${i}].date=this.value;initPeriods(false)"></span>`).join('')}
 function initPeriods(reset){
@@ -735,7 +778,7 @@ const SB_URL='https://prwsexzspskwcgmgmpae.supabase.co',SB_KEY='sb_publishable_4
 let sb=null,isEd=false,hUid=null;
 const R4=v=>Math.round((+v||0)*1e4)/1e4,hMsg=t=>{$('histMsg').textContent=t};
 const encRows=rs=>rs.map(r=>{const e=r.alt.erp,m=r.alt.emp;return[r.code,r.desc,r.grp,r.sup,r.ean,R4(r.qty),R4(r.rev),R4(r.customers),R4(e.cmv),R4(e.profit),R4(e.cmvOff),R4(e.profitOff),...(m?[R4(m.cmv),R4(m.profit),R4(m.cmvOff),R4(m.profitOff)]:[null,null,null,null]),R4(r.ctC)]});
-const decRows=(a,cm)=>a.map(x=>{const r={code:x[0],desc:x[1],grp:x[2],sup:x[3],ean:x[4],qty:x[5],rev:x[6],customers:x[7],alt:{erp:{cmv:x[8],profit:x[9],cmvOff:x[10],profitOff:x[11]},emp:x[12]==null?null:{cmv:x[12],profit:x[13],cmvOff:x[14],profitOff:x[15]}},profitErp:x[9],cmvErp:x[8],ctC:x[16]||0};setCost(r,cm);return r});
+const decRows=(a,cm)=>a.map(x=>{const r={code:x[0],desc:x[1],grp:x[2],sup:x[3],ean:x[4],qty:x[5],rev:x[6],customers:x[7],alt:{erp:{cmv:x[8],profit:x[9],cmvOff:x[10],profitOff:x[11]},emp:x[12]==null?null:{cmv:x[12],profit:x[13],cmvOff:x[14],profitOff:x[15]}},profitErp:x[9],cmvErp:x[8],profitOffErp:x[11],ctC:x[16]||0};setCost(r,cm);return r});
 const hSel=()=>[...document.querySelectorAll('#hBody input[data-d]:checked')].map(x=>x.dataset.d);
 async function hInit(){
  if(!SB_URL||!SB_KEY){hMsg('Histórico não configurado: preencha SB_URL e SB_KEY no início do script do arquivo.');return}
@@ -843,6 +886,136 @@ $('bSave').addEventListener('click',async()=>{if(!sb||!BASE.n)return;if(!confirm
  if(error){alert('Erro ao salvar a base: '+error.message);return}bMsg('Base salva na nuvem.')});
 ['fDepto','fDpto','fComp'].forEach(id=>$(id).addEventListener('change',()=>{if(files.length)runAnalysis()}));
 try{const j=JSON.parse(localStorage.getItem('dgBase')||'null');if(j&&j.list&&j.list.length){setBase(j.list);baseName=j.name||'';baseSummary('Base deste navegador'+(baseName?' ('+baseName+')':''))}}catch(e){}
+
+/* ====== Resumo para o gestor ====== */
+function genSummary(){
+ if(!rows.length)return'Carregue um relatório primeiro.';
+ const loja=$('sumLoja').value.trim()||'a loja',N=Math.max(1,Math.round(P('sumN'))||3),minL=Math.max(0,P('sumMin'));
+ const rev=rows.reduce((a,r)=>a+r.rev,0),pr=rows.reduce((a,r)=>a+r.profitErp,0),mg=rev?pr/rev*100:0;
+ let date=null,rel='no período';
+ if(mode()===1)date=files[0]&&files[0].date;else if(pdays.length===1)date=pdays[0];
+ if(date){const t=new Date();t.setDate(t.getDate()-1);const iso=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  rel=(date===iso?'ontem':'dia '+fmtD(date).slice(0,5))+' ('+new Date(date+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long'})+')'}
+ else if(pdays.length)rel='no período de '+dm(pdays[0])+' a '+dm(pdays[pdays.length-1]);
+ let prev='';
+ if(date){const ds=[...new Set(files.map(f=>f.date))].filter(d=>d<date).sort(),pd=ds[ds.length-1];
+  if(pd){const l=files.filter(f=>f.date===pd).flatMap(f=>f.rows).filter(passRaw),rv=l.reduce((a,r)=>a+r.rev,0),pf=l.reduce((a,r)=>a+r.profitErp,0);if(rv)prev=` (dia anterior, ${dm(pd)}: ${pct(pf/rv*100)})`}}
+ const fl=BASE.n?[$('fDepto').value,$('fDpto').value,$('fComp').value].filter(Boolean):[];
+ const L=[`Bom dia, fechamos ${rel} em ${loja} com margem de ${pct(mg)}${prev}`+(fl.length?` [filtro: ${fl.join(', ')}]`:'')];
+ const neg=rows.filter(r=>r.rev>0&&r.profitErp<=-minL).sort((a,b)=>a.profitErp-b.profitErp),tot=neg.reduce((a,r)=>a+r.profitErp,0);
+ if(neg.length){
+  L.push(`${neg.length} itens com prejuízo (a partir de ${money(minL)} cada), somando ${money(tot)} (${pct(rev?-tot/rev*100:0)} do faturamento).`,'','Principais problemas:');
+  const gk=r=>BASE.n&&r.dpto?r.dpto.replace(/^\d+\s·\s/,''):(r.grp||'Sem grupo'),G=new Map();
+  neg.forEach(r=>{const k=gk(r);let g=G.get(k);if(!g){g={k,loss:0,items:[]};G.set(k,g)}g.loss+=r.profitErp;g.items.push(r)});
+  const cause=(r,m)=>m<=-100?['e','margem muito negativa: possível erro de entrada, custo ou cadastro']:r.offer&&r.profitOffErp<0?['o','em oferta abaixo do custo']:r.ctC>0&&r.rev<r.ctC?['c','vendido abaixo do custo de compra']:['t','vendido abaixo do custo total (compra + ICMS + custo operacional)'];
+  [...G.values()].sort((a,b)=>a.loss-b.loss).slice(0,6).forEach(g=>{
+   const B=new Map();g.items.slice(0,N).forEach(r=>{const m=r.profitErp/r.rev*100,c=cause(r,m),by=$('sumComp').checked&&r.comp?', '+r.comp.split(' ')[0]:'';
+    if(!B.has(c[0]))B.set(c[0],{t:c[1],a:[]});B.get(c[0]).a.push(`${r.desc.trim()} (${pct(m)}${by})`)});
+   L.push(`- ${g.k} (${money(g.loss)}): `+[...B.values()].map(b=>`${b.a.join(', ')} — ${b.t}`).join('; ')+(g.items.length>N?` [+${g.items.length-N} item(ns)]`:'')+'.');
+  });
+ }else L.push('Nenhum item com prejuízo relevante no período.');
+ if($('sumOf').checked){const of=rows.filter(r=>r.offer);
+  if(of.length){const lo=of.reduce((a,r)=>a+r.profitOffErp,0),w=of.filter(r=>r.profitOffErp<0).sort((a,b)=>a.profitOffErp-b.profitOffErp).slice(0,3);
+   L.push('',`Ofertas: ${of.length} itens em oferta, com resultado de ${money(lo)}`+(w.length?`; piores: ${w.map(r=>`${r.desc.trim()} (${money(r.profitOffErp)})`).join(', ')}.`:'.'))}}
+ if($('sumEst').checked&&BASE.hasStock){
+  const cr=rows.filter(r=>r.abc==='A'&&r.estoque!=null&&r.estoque>=0&&covDias(r)!=null&&covDias(r)<1).sort((a,b)=>b.rev-a.rev),ng=rows.filter(r=>r.estoque!=null&&r.estoque<0&&r.qty>0).length;
+  if(cr.length)L.push('',`Estoque: ${cr.length} itens da curva A com estoque zerado ou menos de 1 dia de cobertura (ex.: ${cr.slice(0,3).map(r=>r.desc.trim()).join(', ')}).`);
+  if(ng)L.push(cr.length?'':'',`${ng} itens vendidos com estoque negativo no sistema (conferir recebimentos e inventário).`)}
+ const o=$('sumObs').value.trim();if(o)L.push('','Observações:',o);
+ return L.filter((x,i,a)=>!(x===''&&a[i-1]==='')).join('\n');
+}
+$('sumGen').addEventListener('click',()=>{$('sumTxt').value=genSummary();$('sumMsg').textContent='Resumo gerado. Revise e edite se precisar antes de copiar.'});
+$('sumbox').addEventListener('toggle',()=>{if($('sumbox').open&&!$('sumTxt').value&&rows.length)$('sumTxt').value=genSummary()});
+$('sumCopy').addEventListener('click',async()=>{const t=$('sumTxt').value;if(!t)return;
+ try{await navigator.clipboard.writeText(t)}catch(e){$('sumTxt').select();try{document.execCommand('copy')}catch(e2){}}
+ $('sumMsg').textContent='Texto copiado.'});
+try{const l=localStorage.getItem('dgLoja');if(l)$('sumLoja').value=l}catch(e){}
+$('sumLoja').addEventListener('change',()=>{try{localStorage.setItem('dgLoja',$('sumLoja').value)}catch(e){}});
+
+/* ====== Resultado de reajuste e de campanha ====== */
+const rzLotes=()=>{try{return JSON.parse(localStorage.getItem('dgLotes')||'{}')}catch(e){return{}}};
+const rzStore=o=>{try{localStorage.setItem('dgLotes',JSON.stringify(o))}catch(e){}};
+const rzVar=(a,b)=>a?(b/a-1)*100:null,rzV=x=>x==null?'—':`<span class="${x>=0?'good':'bad'}">${x>=0?'+':''}${pct(x)}</span>`,rzS=v=>(v>=0?'+':'')+money(v);
+function rzFill(){
+ const ds=alldays(),opt=ds.map(d=>`<option value="${d}">${fmtD(d)}</option>`).join('');
+ const st=$('rzStart'),dy=$('rzDay'),cs=st.value,cd=dy.value;
+ st.innerHTML=opt;dy.innerHTML=opt;st.value=ds.includes(cs)?cs:ds[Math.max(1,Math.floor(ds.length/2))]||'';dy.value=ds.includes(cd)?cd:ds[ds.length-1]||'';
+ const L=rzLotes(),sel=$('rzLote'),cur=sel.value;sel.innerHTML='<option value="">(usar os códigos digitados)</option>'+Object.keys(L).map(n=>`<option>${esc(n)}</option>`).join('');sel.value=L[cur]?cur:'';
+}
+const rzParse=t=>t.split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split(/[;\t]/);return{code:p[0].trim(),pn:p[1]?cleanNum(p[1]):0}}).filter(x=>x.code);
+const rzTxtOf=it=>it.map(x=>x.pn?`${x.code};${x.pn}`:x.code).join('\n');
+function rzCur(){const nm=$('rzLote').value;if(nm){const L=rzLotes();return L[nm]?{name:nm,items:L[nm].items}:null}const it=rzParse($('rzCodes').value);return it.length?{name:$('rzName').value.trim()||'Lote sem nome',items:it}:null}
+$('rzType').addEventListener('change',()=>{const a=$('rzType').value==='a';$('rzA').style.display=a?'':'none';$('rzB').style.display=a?'none':'';$('rzSum').innerHTML='';$('rzHead').innerHTML=$('rzBody').innerHTML='';$('rzTxt').value='';$('rzNote').textContent=''});
+$('rzLote').addEventListener('change',()=>{const nm=$('rzLote').value;if(nm){const L=rzLotes();$('rzCodes').value=rzTxtOf(L[nm].items);$('rzName').value=nm}});
+$('rzFromPlan').addEventListener('click',()=>{if(!rows.length){alert('Carregue um relatório primeiro.');return}
+ const n=Math.max(1,Math.round(P('rzN'))||30),l=planData().list.filter(x=>x.f!=='s'&&isFinite(x.gT)).sort((a,b)=>b.gT-a.gT).slice(0,n);
+ $('rzLote').value='';$('rzCodes').value=rzTxtOf(l.map(x=>({code:x.code,pn:Math.round(x.pt*100)/100})));$('rzNote').textContent=`${l.length} itens do plano preenchidos (com o preço sugerido). Ajuste a lista se precisar e salve o lote.`});
+$('rzSave').addEventListener('click',()=>{const it=rzParse($('rzCodes').value),nm=$('rzName').value.trim();if(!it.length){alert('Digite ou cole os códigos do lote.');return}if(!nm){alert('Dê um nome ao lote.');return}
+ const L=rzLotes();L[nm]={items:it,criado:new Date().toISOString()};rzStore(L);rzFill();$('rzLote').value=nm;$('rzNote').textContent=`Lote "${nm}" salvo neste navegador (${it.length} itens).`});
+$('rzDel').addEventListener('click',()=>{const nm=$('rzLote').value;if(!nm)return;if(!confirm('Excluir o lote "'+nm+'"?'))return;const L=rzLotes();delete L[nm];rzStore(L);rzFill();$('rzCodes').value='';$('rzName').value=''});
+$('rzbox').addEventListener('toggle',rzFill);
+['grp','abc','plan'].length;SORTST.rz={c:-1,d:1};
+$('rzHead').addEventListener('click',e=>{const th=e.target.closest('th[data-c]');if(!th)return;const st=SORTST.rz,c=+th.dataset.c;if(st.c===c){if(st.d===1)st.d=-1;else{st.c=-1;st.d=1}}else{st.c=c;st.d=1}if(rzLast)rzLast()});
+let rzLast=null;
+const rzMsg=t=>{$('rzNote').textContent=t;$('rzSum').innerHTML='';$('rzHead').innerHTML=$('rzBody').innerHTML='';$('rzTxt').value=''};
+function rzA(){
+ const ds=alldays(),st=$('rzStart').value,N=Math.max(1,Math.round(P('rzWin'))||7),lote=rzCur();
+ if(ds.length<2)return rzMsg('Carregue pelo menos 2 dias (Modo 2 ou histórico).');if(!lote)return rzMsg('Escolha um lote salvo ou digite os códigos dos itens reajustados.');
+ const i0=ds.indexOf(st),after=ds.slice(i0,i0+N),before=ds.slice(Math.max(0,i0-after.length),i0);
+ if(!before.length)return rzMsg('Não há dias carregados antes da data de início. Carregue os dias anteriores.');
+ const kmap=new Map();daily.forEach((o,k)=>{const c=ncode(k.split('|')[0]);if(!kmap.has(c))kmap.set(c,k)});
+ const lm=new Map();lote.items.forEach(it=>{const k=kmap.get(ncode(it.code));if(k)lm.set(k,it)});const lk=[...lm.keys()];
+ if(!lk.length)return rzMsg('Nenhum código do lote foi encontrado nos relatórios carregados.');
+ const ck=[];daily.forEach((o,k)=>{if(!lm.has(k)&&passB(bInfo(k.split('|')[0],'')))ck.push(k)});
+ const S=(keys,days)=>{let q=0,rv=0,pr=0;keys.forEach(k=>{const o=daily.get(k);days.forEach(d=>{const x=o[d];if(x){q+=x.qty;rv+=x.rev;pr+=x.profit}})});return{q,rv,pr}};
+ const nb=before.length,na=after.length,G=k=>{const b=S(k,before),a=S(k,after);return{b,a,pb:b.q?b.rv/b.q:0,pa:a.q?a.rv/a.q:0,qb:b.q/nb,qa:a.q/na,rb:b.rv/nb,ra:a.rv/na,lb:b.pr/nb,la:a.pr/na,mb:b.rv?b.pr/b.rv*100:0,ma:a.rv?a.pr/a.rv*100:0}};
+ const gL=G(lk),gC=G(ck),gT=G([...lk,...ck]);
+ const gRev=gC.rb?gC.ra/gC.rb-1:0,exp=gL.lb*(1+gRev),netDay=gL.la-exp,netTot=netDay*na;
+ const rowsI=lk.map(k=>{const it=lm.get(k),o=daily.get(k),g=G([k]),dp=g.pb&&g.pa?(g.pa/g.pb-1)*100:null,dq=g.qb?(g.qa/g.qb-1)*100:null,dl=g.la-g.lb;
+  let v,c;if(!g.a.q){v='Sem venda depois (ruptura?)';c='warn'}else if(!g.b.q){v='Sem venda antes (sem base)';c=''}else if(dp==null||Math.abs(dp)<1){v='Preço não mudou (reajuste não aplicado?)';c='warn'}else if(dp<0){v='Preço caiu';c=''}else if(dl>=0&&dq>-30){v='Funcionou';c='good'}else if(dl>=0){v='Lucro subiu, mas perdeu muito volume';c='warn'}else{v='Perdeu lucro: revisar o preço';c='bad'}
+  return{code:it.code,desc:k.split('|').slice(1).join('|'),pn:it.pn,g,dp,dq,dl,v,c,el:dp>=1&&dq!=null?dq/dp:null}});
+ const cnt=x=>rowsI.filter(r=>r.v.startsWith(x)).length,okN=cnt('Funcionou'),volN=cnt('Lucro subiu'),perdN=cnt('Perdeu'),semN=cnt('Preço não'),nosale=cnt('Sem venda');
+ const fl=BASE.n?[$('fDepto').value,$('fDpto').value,$('fComp').value].filter(Boolean):[];
+ $('rzNote').textContent=`Antes: ${dm(before[0])} a ${dm(before[nb-1])} (${nb} dia(s)). Depois: ${dm(after[0])} a ${dm(after[na-1])} (${na} dia(s)).`+(nb!==na?' Atenção: janelas de tamanho diferente.':'')+(fl.length?` Controle limitado ao filtro: ${fl.join(', ')}.`:'')+` ${lk.length} de ${lote.items.length} itens do lote encontrados.`;
+ const row=(n,g,x)=>`<tr><td class="l"><b>${n}</b></td><td>${money(g.pb)} → ${money(g.pa)} ${rzV(rzVar(g.pb,g.pa))}</td><td>${num(g.qb)} → ${num(g.qa)} ${rzV(rzVar(g.qb,g.qa))}</td><td>${money(g.rb)} → ${money(g.ra)} ${rzV(rzVar(g.rb,g.ra))}</td><td>${money(g.lb)} → ${money(g.la)} (${rzS(g.la-g.lb)})</td><td>${pct(g.mb)} → ${pct(g.ma)}</td></tr>`;
+ $('rzSum').innerHTML=`<div class="kpis" style="margin:12px 0"><div class="kpi"><small>Preço médio do lote</small><b style="font-size:17px">${rzV(rzVar(gL.pb,gL.pa))}</b></div><div class="kpi"><small>Volume por dia: lote | demais itens</small><b style="font-size:17px">${rzV(rzVar(gL.qb,gL.qa))} | ${rzV(rzVar(gC.qb,gC.qa))}</b></div><div class="kpi"><small>Lucro por dia do lote</small><b style="font-size:17px">${rzS(gL.la-gL.lb)}</b></div><div class="kpi"><small>Efeito líquido no período (descontando os demais itens)</small><b style="font-size:17px" class="${netTot>=0?'good':'bad'}">${rzS(netTot)}</b></div><div class="kpi"><small>Margem do lote</small><b style="font-size:17px">${pct(gL.mb)} → ${pct(gL.ma)}</b></div><div class="kpi"><small>Margem da loja</small><b style="font-size:17px">${pct(gT.mb)} → ${pct(gT.ma)}</b></div></div>
+ <table class="cmp"><thead><tr><th class="l"></th><th>Preço médio</th><th>Qtde por dia</th><th>Faturamento por dia</th><th>Lucro por dia</th><th>Margem</th></tr></thead><tbody>${row('Lote',gL)}${row('Demais itens',gC)}${row('Loja (todos)',gT)}</tbody></table>`;
+ const cols=[{h:'Código',l:1,v:r=>String(r.code)},{h:'Descrição',l:1,v:r=>r.desc,f:r=>esc(r.desc)},{h:'Preço antes',v:r=>r.g.pb,f:r=>money(r.g.pb)},{h:'Preço planejado',v:r=>r.pn||0,f:r=>r.pn?money(r.pn):'—'},{h:'Preço depois',v:r=>r.g.pa,f:r=>money(r.g.pa)},{h:'Var. preço',v:r=>r.dp==null?-1e9:r.dp,f:r=>rzV(r.dp)},{h:'Qtde/dia antes',v:r=>r.g.qb,f:r=>num(r.g.qb)},{h:'Qtde/dia depois',v:r=>r.g.qa,f:r=>num(r.g.qa)},{h:'Var. volume',v:r=>r.dq==null?-1e9:r.dq,f:r=>rzV(r.dq)},{h:'Lucro/dia antes',v:r=>r.g.lb,f:r=>money(r.g.lb)},{h:'Lucro/dia depois',v:r=>r.g.la,f:r=>money(r.g.la)},{h:'Δ lucro/dia',v:r=>r.dl,f:r=>rzS(r.dl),k:r=>r.dl<0?'bad':'good'},{h:'Resultado',l:1,v:r=>r.v,k:r=>r.c}];
+ rzLast=()=>tbl('rz',cols,rowsI,500);rzLast();
+ const el=rowsI.filter(r=>r.el!=null&&r.dq!=null),elm=el.length?el.reduce((a,r)=>a+r.el,0)/el.length:null;
+ $('rzTxt').value=[`Resultado do reajuste "${lote.name}" (${lk.length} itens), preço novo a partir de ${fmtD(st)}.`,
+  `Preço médio do lote ${gL.pb&&gL.pa?(rzVar(gL.pb,gL.pa)>=0?'+':'')+pct(rzVar(gL.pb,gL.pa)):'—'}; volume por dia ${rzVar(gL.qb,gL.qa)==null?'—':(rzVar(gL.qb,gL.qa)>=0?'+':'')+pct(rzVar(gL.qb,gL.qa))} (demais itens: ${rzVar(gC.qb,gC.qa)==null?'—':(rzVar(gC.qb,gC.qa)>=0?'+':'')+pct(rzVar(gC.qb,gC.qa))}).`,
+  `Lucro por dia do lote: ${money(gL.lb)} → ${money(gL.la)} (${rzS(gL.la-gL.lb)}). Margem do lote ${pct(gL.mb)} → ${pct(gL.ma)}; margem da loja ${pct(gT.mb)} → ${pct(gT.ma)}.`,
+  `Efeito líquido estimado no período, descontando a variação dos demais itens: ${rzS(netTot)}.`+(elm!=null?` Elasticidade média observada: ${num(Math.round(elm*100)/100)} (queda de volume por 1% de aumento de preço).`:''),
+  `Por item: ${okN} funcionaram, ${volN} subiram o lucro mas perderam muito volume, ${perdN} perderam lucro, ${semN} sem mudança de preço, ${nosale} sem venda em algum dos períodos.`].join('\n');
+}
+function rzB(){
+ const ds=alldays(),D=$('rzDay').value,md=$('rzBase').value,NB=Math.max(1,Math.round(P('rzNB'))||4);
+ if(ds.length<2)return rzMsg('Carregue pelo menos 2 dias (Modo 2 ou histórico).');
+ const wd=d=>new Date(d+'T12:00:00').getDay(),base=md==='wd'?ds.filter(d=>d<D&&wd(d)===wd(D)).slice(-NB):ds.filter(d=>d<D).slice(-NB);
+ if(!base.length)return rzMsg(md==='wd'?'Não há outro dia da mesma semana antes da oferta. Use "Dias anteriores" ou carregue mais dias.':'Não há dias carregados antes da oferta.');
+ const keys=[];daily.forEach((o,k)=>{if(passB(bInfo(k.split('|')[0],'')))keys.push(k)});
+ const tot=day=>{const t={rv:0,pr:0,cu:0,n:0,of:0,ofRv:0,ofPr:0};keys.forEach(k=>{const x=daily.get(k)[day];if(!x||!(x.qty>0))return;t.n++;t.rv+=x.rev;t.pr+=x.profit;t.cu+=x.cust||0;if(x.cmvOff>0){t.of++;t.ofRv+=x.cmvOff+x.profitOff;t.ofPr+=x.profitOff}});return t};
+ const TD=tot(D),TB=base.map(tot),av=f=>TB.reduce((a,x)=>a+f(x),0)/TB.length;
+ const rowsT=[['Faturamento',TD.rv,av(x=>x.rv),'m'],['Lucro',TD.pr,av(x=>x.pr),'m'],['Margem',TD.rv?TD.pr/TD.rv*100:0,av(x=>x.rv)?av(x=>x.pr)/av(x=>x.rv)*100:0,'p'],['Clientes (soma por item)',TD.cu,av(x=>x.cu),'n'],['Itens vendidos',TD.n,av(x=>x.n),'n'],['Itens em oferta',TD.of,av(x=>x.of),'n'],['Faturamento em oferta',TD.ofRv,av(x=>x.ofRv),'m'],['Resultado das ofertas',TD.ofPr,av(x=>x.ofPr),'m']];
+ const f=(v,t)=>t==='m'?money(v):t==='p'?pct(v):num(v);
+ const offK=keys.filter(k=>{const x=daily.get(k)[D];return x&&x.cmvOff>0});
+ const items=offK.map(k=>{const o=daily.get(k),x=o[D],bq=base.reduce((a,d)=>a+((o[d]||{}).qty||0),0)/base.length,bl=base.reduce((a,d)=>a+((o[d]||{}).profit||0),0)/base.length,brv=base.reduce((a,d)=>a+((o[d]||{}).rev||0),0),bqt=base.reduce((a,d)=>a+((o[d]||{}).qty||0),0),up=bq>0?x.qty/bq:null;
+  let v,c;if(up==null){v='Sem venda nos dias normais (sem base)';c=''}else if(up>=1.5){v=x.profitOff>=0?'Trouxe volume e deu lucro':'Trouxe volume, mas a oferta deu prejuízo';c=x.profitOff>=0?'good':'warn'}else if(up>=1.2){v='Pouco volume extra'+(x.profitOff<0?' e com prejuízo':'');c=x.profitOff<0?'bad':''}else{v='Sem efeito no volume'+(x.profitOff<0?' e com prejuízo: retirar da próxima':'');c=x.profitOff<0?'bad':'warn'}
+  return{desc:k.split('|').slice(1).join('|'),code:k.split('|')[0],q:x.qty,bq,up,p:x.qty?x.rev/x.qty:0,bp:bqt?brv/bqt:0,l:x.profit,bl,dl:x.profit-bl,po:x.profitOff,v,c}});
+ const net=items.reduce((a,r)=>a+r.dl,0);
+ $('rzNote').textContent=`Dia da oferta: ${fmtD(D)} (${new Date(D+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long'})}). Base: ${base.map(dm).join(', ')} (${base.length} dia(s)).`+(base.length<NB?' Poucos dias na base: o resultado é menos confiável.':'');
+ $('rzSum').innerHTML=`<div class="kpis" style="margin:12px 0"><div class="kpi"><small>Itens em oferta no dia</small><b style="font-size:17px">${num(offK.length)}</b></div><div class="kpi"><small>Resultado das ofertas</small><b style="font-size:17px" class="${TD.ofPr>=0?'good':'bad'}">${rzS(TD.ofPr)}</b></div><div class="kpi"><small>Efeito dos itens em oferta vs dia normal</small><b style="font-size:17px" class="${net>=0?'good':'bad'}">${rzS(net)}</b></div><div class="kpi"><small>Lucro da loja: oferta | base</small><b style="font-size:17px">${money(TD.pr)} | ${money(av(x=>x.pr))}</b></div></div><table class="cmp"><thead><tr><th class="l"></th><th>Dia da oferta</th><th>Média da base</th><th>Variação</th></tr></thead><tbody>${rowsT.map(r=>`<tr><td class="l"><b>${r[0]}</b></td><td>${f(r[1],r[3])}</td><td>${f(r[2],r[3])}</td><td>${r[3]==='p'?`<span class="${r[1]>=r[2]?'good':'bad'}">${r[1]>=r[2]?'+':''}${num(r[1]-r[2])} p.p.</span>`:rzV(rzVar(r[2],r[1]))}</td></tr>`).join('')}</tbody></table>`;
+ const cols=[{h:'Código',l:1,v:r=>String(r.code)},{h:'Descrição',l:1,v:r=>r.desc,f:r=>esc(r.desc)},{h:'Qtde no dia',v:r=>r.q,f:r=>num(r.q)},{h:'Qtde média normal',v:r=>r.bq,f:r=>num(r.bq)},{h:'Volume (×)',v:r=>r.up==null?1e9:r.up,f:r=>r.up==null?'—':num(Math.round(r.up*100)/100)+'×'},{h:'Preço oferta',v:r=>r.p,f:r=>money(r.p)},{h:'Preço normal',v:r=>r.bp,f:r=>r.bp?money(r.bp):'—'},{h:'Lucro no dia',v:r=>r.l,f:r=>money(r.l)},{h:'Lucro médio normal',v:r=>r.bl,f:r=>money(r.bl)},{h:'Δ lucro',v:r=>r.dl,f:r=>rzS(r.dl),k:r=>r.dl<0?'bad':'good'},{h:'Resultado da oferta',v:r=>r.po,f:r=>rzS(r.po),k:r=>r.po<0?'bad':'good'},{h:'Leitura',l:1,v:r=>r.v,k:r=>r.c}];
+ rzLast=()=>tbl('rz',cols,items,500);if(SORTST.rz.c<0){SORTST.rz.c=10;SORTST.rz.d=1}rzLast();
+ const good=items.filter(r=>r.c==='good').sort((a,b)=>b.dl-a.dl).slice(0,3),bad=items.filter(r=>r.po<0).sort((a,b)=>a.po-b.po).slice(0,3);
+ $('rzTxt').value=[`Dia de oferta ${fmtD(D)}: faturamento ${money(TD.rv)} (média normal ${money(av(x=>x.rv))}), lucro ${money(TD.pr)} (média ${money(av(x=>x.pr))}), margem ${pct(TD.rv?TD.pr/TD.rv*100:0)} (normal ${pct(av(x=>x.rv)?av(x=>x.pr)/av(x=>x.rv)*100:0)}).`,
+  `Ofertas: ${offK.length} itens, resultado ${rzS(TD.ofPr)}. Efeito dos itens em oferta sobre o lucro, comparado a um dia normal: ${rzS(net)}.`,
+  good.length?`Ofertas que trouxeram volume e lucro: ${good.map(r=>`${r.desc.trim()} (${num(Math.round(r.up*10)/10)}×)`).join(', ')}.`:'',
+  bad.length?`Maiores prejuízos nas ofertas: ${bad.map(r=>`${r.desc.trim()} (${rzS(r.po)})`).join(', ')}.`:''].filter(Boolean).join('\n');
+}
+$('rzRun').addEventListener('click',()=>{if(!files.length||!daily.size){rzMsg('Carregue os relatórios primeiro.');return}if(!$('rzStart').options.length)rzFill();SORTST.rz={c:-1,d:1};$('rzType').value==='a'?rzA():rzB()});
+$('rzCopy').addEventListener('click',async()=>{const t=$('rzTxt').value;if(!t)return;try{await navigator.clipboard.writeText(t)}catch(e){$('rzTxt').select();try{document.execCommand('copy')}catch(e2){}}$('rzNote').textContent+=' Texto copiado.'});
 hInit();
 </script>
 </body></html>
